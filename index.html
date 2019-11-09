@@ -10,19 +10,24 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-
+    <link rel="stylesheet" href="styles/styles.css">
 
     <title>Weather Dashboard</title>
 </head>
 
 <body>
     <header>
-        Weather Dashboard
+        <h1>
+            Weather Dashboard
+        </h1>
+
     </header>
     <aside>
         <form class="form-inline md-form mr-auto mb-4">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-            <button class="btn btn-rounded btn-sm my-0" type="submit"><span class="fa fa-search"></span></button>
+            <label for="txt-city"> Search for a City:</label>
+            <input id="txt-city" class="form-control mr-sm-2" type="text">
+            <button id="btn-search" class="btn btn-rounded btn-sm" type="submit"><span class="fa fa-search"></span></button>
+
         </form>
         <ul class="list-group">
             <!-- searched cities goes here -->
@@ -36,7 +41,7 @@
             </div>
         </div>
         <div class="row forecast">
-           
+
         </div>
     </main>
 
@@ -49,6 +54,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+
+    <script src="./scripts/data.js"></script>
 
 </body>
 

@@ -1,0 +1,17 @@
+header{
+    background: #333;
+    color: #ddd;
+    text-align: center;
+    padding: 1.5rem;
+}
+
+aside{
+    width: 30%;
+}
+
+#btn-search{
+    background: #006fff;
+    font-size: 1.1rem;
+    color: whitesmoke;
+    box-shadow: 0px 0px 3px 3px #006fff96;
+}
