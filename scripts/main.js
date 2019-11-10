@@ -41,5 +41,19 @@ function getWeather(cityInfo){
         method: "GET"
     }).done(function(response){
         console.log(response);
+        
     })
 }
+
+/*
+when user click search button
+1. disbled the form 
+2. get current weather info from weather.com api
+3. if success
+    a. add cityname to city list & update localstorage. 
+    2. display current weather in current weather info
+    3. get the forecast info
+        1. if success, diplay the forecast for each day in forecast
+        2. if fail, show error message
+4. if failed. show error message. 
+*/
