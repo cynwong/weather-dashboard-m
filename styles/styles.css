@@ -5,8 +5,14 @@ header{
     padding: 1.5rem;
 }
 
+.bodycontainer{
+    display:flex;
+    flex-direction: row;
+}
+
 aside{
-    width: 30%;
+    flex-basis:30%;
+    flex-grow:0;
 }
 
 #btn-search{
@@ -23,4 +29,18 @@ aside{
 }
 #btn-search:hover{
     border: 1px solid #0842e6;
+}
+
+main{
+    flex-basis:70%;
+    margin-top: 1.3rem;
+    flex-grow:1;
+}
+main .row {
+    min-height:10rem;
+}
+
+main .row #current-weather-info{
+    border: 1px solid darkgray;
+    min-height:50vh;
 }
