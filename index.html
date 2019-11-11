@@ -38,7 +38,42 @@
         </aside>
         <main class="container">
             <div class="row">
-                <div class="col-12" id="current-weather-info">
+                <div class="col-12" id="current-weather-container">
+                    <section class="city-section">
+                        <h2>
+                            <span id="city"></span>
+                            (<span id="date"></span>)
+                            <span><img id="icon"></span>
+                        </h2>
+                    </section>
+                    <section class="temperature-section">
+                        <p>
+                            Temperature:&nbsp;
+                            <span id="temp"></span>
+                            <span id="temp-unit"></span>
+                        </p>
+                    </section>
+                    <section class="humidity-section">
+                        <p>
+                            Humidity:&nbsp;
+                            <span id="humidity"></span>
+                            <span id="humidity-unit"></span>
+                        </p>
+                    </section>
+                    <section class="wind-speed-section">
+                        <p>
+                            Wind Speed:&nbsp;
+                            <span id="wind-speed"></span>
+                            <span id="wind-speed-unit"></span>
+                        </p>
+                    </section>
+                    <section class="uv-index-section">
+                        <p>
+                            UV Index:&nbsp;
+                            <span id="uv-index"></span>
+                            <span id="uv-index-unit"></span>
+                        </p>
+                    </section>
 
                 </div>
             </div>
@@ -56,6 +91,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"
+        integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
 
     <script src="./scripts/data.js"></script>
     <script src="./scripts/storage-handler.js"></script>
