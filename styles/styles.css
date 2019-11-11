@@ -31,16 +31,44 @@ aside{
     border: 1px solid #0842e6;
 }
 
+#current-weather-container{
+    display:none;
+}
+
 main{
     flex-basis:70%;
     margin-top: 1.3rem;
     flex-grow:1;
-}
-main .row {
-    min-height:10rem;
+    background-color: #e3e3ec;
+    padding-bottom:2.5rem;
 }
 
 main .row #current-weather-info{
     border: 1px solid darkgray;
-    min-height:50vh;
+    /* min-height:50vh; */
+}
+
+#icon{
+    /* background-color:gray; */
+    border-radius:50px;
+}
+
+.uv-low{
+    background-color:limegreen;
+}
+
+.uv-moderate{
+    background-color: yellow;
+}
+
+.uv-high{
+    background-color: orange;
+}
+
+.uv-very-high{
+    background-color: red;
+}
+
+.uv-extreme{
+    background-color:rebeccapurple ;
 }
