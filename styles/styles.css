@@ -53,6 +53,10 @@ main .row #current-weather-info{
     border-radius:50px;
 }
 
+#uv-index{
+    padding: 2px 5px;
+}
+
 .uv-low{
     background-color:limegreen;
 }
