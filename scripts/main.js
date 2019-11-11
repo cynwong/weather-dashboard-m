@@ -71,11 +71,11 @@ function getURL(type = QUERY_WEATHER) {
     if (type.localeCompare(QUERY_WEATHER) === 0) {
         url += API_SETTINGS.nowWeatherLocation;
         query = this.getQuery(false);
-    } else if (type.localeCompare("forecast") === 0) {
+    } else if (type.localeCompare(QUERY_FORECAST) === 0) {
         //if query for weather forecast
         url += API_SETTINGS.forecastLocation;
         query = this.getQuery(false);
-    } else if (type.localeCompare("uvIndex") === 0) {
+    } else if (type.localeCompare(QUERY_UV_INDEX) === 0) {
         url += API_SETTINGS.uvIndexLocation;
         query = this.getQuery(true);
     } else {
@@ -84,11 +84,12 @@ function getURL(type = QUERY_WEATHER) {
         console.log("Invalid url type:", type);
         return;
     }
-    url += "?appid="+ API_SETTINGS.apiKey; // add api key to url
+    url += "?appid=" + API_SETTINGS.apiKey; // add api key to url
     url += query;   //add query
 
+    console.log(url)
     return url;
-    
+
 }
 /**
  * build query string for query URL
@@ -96,13 +97,14 @@ function getURL(type = QUERY_WEATHER) {
  * @return {string}
  */
 function getQuery(isOnlyCoords = false) {
+    let query;
     if (CURRENT_CITY.latitude !== "" && CURRENT_CITY.longitude !== "") {
         return `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
     } else if (!isOnlyCoords && CURRENT_CITY.name) {
         //if not only-coordinate-query and have city name
         //use cityname as query
-        let query = "&q="+this.name;
-        if(typeof CURRENT_CITY.country !== "undefined" && CURRENT_CITY.country.length > 0){
+        query = "&q=" + this.name;
+        if (typeof CURRENT_CITY.country !== "undefined" && CURRENT_CITY.country.length > 0) {
             //if there is country value
             query += ",".CURRENT_CITY.country;
         }
@@ -112,12 +114,36 @@ function getQuery(isOnlyCoords = false) {
 }
 
 function loadPageData() {
-    console.log(getURL())
-}
+    //get Weather data
+    $.ajax({
+        url: getURL(QUERY_WEATHER),
+        method: "GET"
+    }).done(
+        renderWeather
+    ).fail(error => {
+        displayError(error.responseJSON);
+    });
 
-// function getWeatherData(cityInfo) {
-//     getWeather(cityInfo);
-// }
+    //get UV Indes data
+    $.ajax({
+        url: getURL(QUERY_UV_INDEX),
+        method: "GET"
+    }).done(
+        renderUVIndex
+    ).fail(error => {
+        displayError(error.responseJSON);
+    });
+
+    //get Forecast data
+    $.ajax({
+        url: getURL(QUERY_FORECAST),
+        method: "GET"
+    }).done(response => {
+
+    }).fail(error => {
+        displayError(error.responseJSON);
+    });
+}
 
 function displayError(error) {
     let message = "";
@@ -138,40 +164,87 @@ function displayError(error) {
         $("<div>").addClass("alert").text(message)
     );
 }
-// function renderWeather(weatherInfo) {
-//     const weatherIcon = SETTINGS.weatherIcon;
-//     const weather = weatherInfo.weather[0];
-//     const main = weatherInfo.main;
+function renderWeather(info) {
+    const weatherIcon = API_SETTINGS.weatherIcon;
+    const weather = info.weather[0];
+    const main = info.main;
 
-//     //remove the previous alerts
-//     $(".alert").remove();
+    //remove the previous alerts
+    $(".alert").remove();
 
-//     //update current weather info
-//     $("#city").text(weatherInfo.name);
+    //update current weather info
+    $("#city").text(info.name);
 
-//     $("#date").text(TODAY.format("D/M/YYYY"))
+    $("#date").text(TODAY.format("D/M/YYYY"))
 
 
-//     $("#icon").attr({
-//         alt: weather.description,
-//         src: weatherIcon.url + weather.icon + weatherIcon.suffixNormal
-//     });
+    $("#icon").attr({
+        alt: weather.description,
+        src: weatherIcon.url + weather.icon + weatherIcon.suffixNormal
+    });
 
-//     $("#temp").text(main.temp);
-//     $("#temp-unit").html(SETTINGS.temperatureUnit.htmlSymbol);
+    $("#temp").text(main.temp);
+    $("#temp-unit").html(API_SETTINGS.temperatureUnit.htmlSymbol);
 
-//     $("#humidity").text(main.humidity);
-//     $("#humidity-unit").text(SETTINGS.humidity.unit);
+    $("#humidity").text(main.humidity);
+    $("#humidity-unit").text(API_SETTINGS.humidity.unit);
 
-//     $("#wind-speed").text(weatherInfo.wind.speed);
-//     $("#wind-speed-unit").text(SETTINGS.windSpeed.unit);
+    $("#wind-speed").text(info.wind.speed);
+    $("#wind-speed-unit").text(API_SETTINGS.windSpeed.unit);
 
-//     //now display the current weather info container.
-//     $("#current-weather-container").show();
+    //now display the current weather info container.
+    $("#current-weather-container").show();
 
-//     //uv index is not in the response. need to do another ajax. 
+    //Note: UV index is in another API call. so it is in another function. 
+}
 
-// }
+function getUVclass(value) {
+    function between(value, min, max) {
+        return value >= min && value <= max;
+    }
+    const range = API_SETTINGS.uvIndex.range;
+    let prop;
+    for (prop in range) {
+        // console.log(prop);
+        if ((prop === "extreme" && value >= range[prop].min) || between(value, range[prop].min, range[prop].max)) {
+            break;
+
+        }
+    }
+    switch (prop) {
+        case "low":
+            return "uv-low";
+        case "moderate":
+            return "uv-moderate";
+        case "high":
+            return "uv-high";
+        case "veryHigh":
+            return "uv-very-high";
+        default:
+            return "uv-extreme";
+    }
+}
+
+function renderUVIndex(info) {
+    let unit = API_SETTINGS.uvIndex.unit;
+    let value = info.value;
+    let classname = getUVclass(value);
+    console.log(classname);
+
+    $("#uv-index").text(value).addClass(classname);
+
+
+
+    if (unit) {
+        $("uv-index-unit").text(unit);
+    }
+
+    if ($("#current-weather-container").is(":hidden")) {
+        //if current weather container is not shown. 
+        $("#current-weather-container").show();
+    }
+
+}
 
 
 // function getWeather(cityInfo) {
