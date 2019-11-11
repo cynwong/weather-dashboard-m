@@ -1,34 +1,123 @@
-const TODAY =  moment();
+const TODAY = moment();
+const CITIES = [];
+const CURRENT_CITY = {
+    name: "",
+    country: "",
+    longitude: "",
+    latitude: "",
+};
+
+const QUERY_WEATHER = "weather";
+const QUERY_FORECAST = "forecast";
+const QUERY_UV_INDEX = "uv-index";
+
 
 $(document).ready(function () {
+
+    getCurrentLocation();
+
+    //--------- Add event listeners -----------
     $("#btn-search").on("click", function (event) {
         event.preventDefault();
         disabledForm();
 
-        console.log("btn-search is clicked!");
-
         let selectedCity = $("#txt-city").val().trim();
         // cityInfo = cityInfo.trim();
 
-        getWeatherData(selectedCity);
+        // getWeatherData(selectedCity);
 
 
     })
 });
 
+function getCurrentLocation() {
+    if ("geolocation" in navigator) {
+        //goolocation is available, get the location.
+        navigator.geolocation.getCurrentPosition(function (position) {
+            if (typeof position === "undefined") {
+                return -1;
+            }
+            CURRENT_CITY.latitude = position.coords.latitude;
+            CURRENT_CITY.longitude = position.coords.longitude;
+            loadPageData();
+        })
+    }
+}
+/**
+ * Disable search input box and button
+ */
 function disabledForm() {
     $("#btn-search").attr("disabled", true);
     $("#txt-city").attr("disabled", true);
 }
 
+/**
+ * Enable search inputbox and button
+ */
 function enabledForm() {
     $("#btn-search").removeAttr("disabled");
     $("#txt-city").removeAttr("disabled");
 }
 
-function getWeatherData(cityInfo) {
-    getWeather(cityInfo);
+/**
+ * built query URL
+ * @param {string} type values: weather, forecast or uvindex. 
+ * @return {string} url
+ */
+function getURL(type = QUERY_WEATHER) {
+    let url = API_SETTINGS.baseURL;
+    let query = "";
+
+    if (type.localeCompare(QUERY_WEATHER) === 0) {
+        url += API_SETTINGS.nowWeatherLocation;
+        query = this.getQuery(false);
+    } else if (type.localeCompare("forecast") === 0) {
+        //if query for weather forecast
+        url += API_SETTINGS.forecastLocation;
+        query = this.getQuery(false);
+    } else if (type.localeCompare("uvIndex") === 0) {
+        url += API_SETTINGS.uvIndexLocation;
+        query = this.getQuery(true);
+    } else {
+        //if not, the above types then throw an error
+        displayError("Invalid URL location");
+        console.log("Invalid url type:", type);
+        return;
+    }
+    url += "?appid="+ API_SETTINGS.apiKey; // add api key to url
+    url += query;   //add query
+
+    return url;
+    
 }
+/**
+ * build query string for query URL
+ * @param {boolean} isOnlyCoords if true, built the url with only lat & lon values. if false, we can use city name as query.
+ * @return {string}
+ */
+function getQuery(isOnlyCoords = false) {
+    if (CURRENT_CITY.latitude !== "" && CURRENT_CITY.longitude !== "") {
+        return `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
+    } else if (!isOnlyCoords && CURRENT_CITY.name) {
+        //if not only-coordinate-query and have city name
+        //use cityname as query
+        let query = "&q="+this.name;
+        if(typeof CURRENT_CITY.country !== "undefined" && CURRENT_CITY.country.length > 0){
+            //if there is country value
+            query += ",".CURRENT_CITY.country;
+        }
+        return query;
+    }
+    return ""; //return empty string so that it won't break others. 
+}
+
+function loadPageData() {
+    console.log(getURL())
+}
+
+// function getWeatherData(cityInfo) {
+//     getWeather(cityInfo);
+// }
 
 function displayError(error) {
     let message = "";
@@ -49,91 +138,66 @@ function displayError(error) {
         $("<div>").addClass("alert").text(message)
     );
 }
-function renderWeather(weatherInfo) {
-    const weatherIcon = SETTINGS.weatherIcon;
-    const weather = weatherInfo.weather[0];
-    const main = weatherInfo.main;
+// function renderWeather(weatherInfo) {
+//     const weatherIcon = SETTINGS.weatherIcon;
+//     const weather = weatherInfo.weather[0];
+//     const main = weatherInfo.main;
 
-    //remove the previous alerts
-    $(".alert").remove();
+//     //remove the previous alerts
+//     $(".alert").remove();
 
-    //update current weather info
-    $("#city").text(weatherInfo.name);
+//     //update current weather info
+//     $("#city").text(weatherInfo.name);
 
-    $("#date").text(TODAY.format("D/M/YYYY"))
-
-    
-    $("#icon").attr({
-        alt: weather.description,
-        src: weatherIcon.url + weather.icon + weatherIcon.suffixNormal
-    });
-
-    $("#temp").text(main.temp);
-    $("#temp-unit").html(SETTINGS.temperatureUnit.htmlSymbol);
-
-    $("#humidity").text(main.humidity);
-    $("#humidity-unit").text(SETTINGS.humidity.unit);
-
-    $("#wind-speed").text(weatherInfo.wind.speed);
-    $("#wind-speed-unit").text(SETTINGS.windSpeed.unit);
-
-    //now display the current weather info container.
-    $("#current-weather-container").show();
-    
-    //uv index is not in the response. need to do another ajax. 
-
-}
-
-/**
- * 
- * @param {string} type weather,forecast or uvIndex
- * @param {string} city name of the city
- * @param {string} country optional name of the country. 
- */
-function getURL(type, city, country = ""){
-    let url = SETTINGS.baseURL;
-    if(type.localeCompare("weather")===0){
-        //if query for current weather
-        url+= SETTINGS.nowWeatherLocation;
-    } else if (type.localeCompare("forecast")===0){
-        //if query for weather forecast
-        url+= SETTINGS.forecastLocation;
-    }else if(type.localeCompare("uvIndex")===0){
-        url += SETTINGS.uvIndexLocation;
-    }else{
-        //if not, the above types then throw an error
-        displayError("Invalid URL location");
-        console.log("Invalid url type:", type);
-        return;
-    }
-    url+="?appid="+SETTINGS.apiKey;  // add api key to url
+//     $("#date").text(TODAY.format("D/M/YYYY"))
 
 
-}
-function getWeather(cityInfo) {
-    let queryURL = SETTINGS.currentWeatherBaseURL + `appid=${SETTINGS.apiKey}` + `&q=${cityInfo}` + `&units=${SETTINGS.temperatureUnit.api}`;
-    console.log(queryURL);
-    $.ajax({
-        url: queryURL,
-        method: "GET"
-    }).done((weatherResponse) => {
+//     $("#icon").attr({
+//         alt: weather.description,
+//         src: weatherIcon.url + weather.icon + weatherIcon.suffixNormal
+//     });
 
-        $.ajax()
-        renderWeather(response);
-    }).fail(error => {
-        console.log(error);
+//     $("#temp").text(main.temp);
+//     $("#temp-unit").html(SETTINGS.temperatureUnit.htmlSymbol);
 
-        displayError(error.responseJSON);
-    });
-    enabledForm();
-}
+//     $("#humidity").text(main.humidity);
+//     $("#humidity-unit").text(SETTINGS.humidity.unit);
+
+//     $("#wind-speed").text(weatherInfo.wind.speed);
+//     $("#wind-speed-unit").text(SETTINGS.windSpeed.unit);
+
+//     //now display the current weather info container.
+//     $("#current-weather-container").show();
+
+//     //uv index is not in the response. need to do another ajax. 
+
+// }
+
+
+// function getWeather(cityInfo) {
+//     let queryURL = SETTINGS.currentWeatherBaseURL + `appid=${SETTINGS.apiKey}` + `&q=${cityInfo}` + `&units=${SETTINGS.temperatureUnit.api}`;
+//     console.log(queryURL);
+//     $.ajax({
+//         url: queryURL,
+//         method: "GET"
+//     }).done((weatherResponse) => {
+
+//         // $.ajax()
+//         renderWeather(response);
+//     }).fail(error => {
+//         console.log(error);
+
+//         displayError(error.responseJSON);
+//     });
+//     enabledForm();
+// }
 /**
  * call when user search for a city or when the page is loaded.
- * reset the page depending on the user choice. 
+ * reset the page depending on the user choice.
  */
-function resetCity() {
+// function resetCity() {
 
-}
+// }
 
 /*
 when user click search button
