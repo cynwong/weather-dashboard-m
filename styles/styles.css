@@ -13,6 +13,7 @@ header{
 aside{
     flex-basis:30%;
     flex-grow:0;
+    margin: 5px;
 }
 
 #btn-search{
@@ -34,6 +35,12 @@ aside{
 .city-list{
     min-height:5rem;
     background-color: lightgray;
+    
+}
+
+.city-list .add-new{
+    text-align: right;
+    padding-right:1rem;
 }
 
 .city-list li:nth-child(odd){
@@ -49,7 +56,7 @@ aside{
     
 }
 
-#current-weather-container{
+.hidden, .template{
     display:none;
 }
 
@@ -109,9 +116,7 @@ main .row #current-weather-info{
     background-color: white;
 }
 
-.forecast-container .template{
-    display:none;
-}
+
 
 .forecast-container .col-auto{
     background: aqua;

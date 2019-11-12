@@ -1,5 +1,5 @@
 // const TODAY = moment();
-const CITIES = [];
+let CITIES = [];
 const CURRENT_CITY = {
     name: "",
     country: "",
@@ -16,8 +16,8 @@ const STORAGE = new StorageHandler("cities", CITIES);
 
 $(document).ready(function () {
 
+    loadCities();
     getCurrentLocation();
-
     //--------- Add event listeners -----------
     $(".draggable").draggable({
         revert: true
@@ -26,14 +26,13 @@ $(document).ready(function () {
         classes: {
             "ui-droppable-hover": "ui-state-hover"
         },
-        drop: function (event, ui) {
+        drop: function () {
             if (CITIES.indexOf(CURRENT_CITY) !== -1) {
                 //if we have the name already then, don't add
                 return;
             }
-            $(this).append(
-                $("li.template").clone().removeClass("template").text(CURRENT_CITY.name)
-            );
+            console.log("here")
+            addCityToListGroup(CURRENT_CITY.name);
             saveCity();
         }
     });
@@ -43,7 +42,6 @@ $(document).ready(function () {
 
         let selectedCity = $("#txt-city").val().trim().split(",")[0];
 
-        // console.log(selectedCity);
         updateCityInfo(selectedCity);
         loadPageData();
 
@@ -51,11 +49,23 @@ $(document).ready(function () {
     })
 });
 
+function addCityToListGroup(name){
+    $(".list-group").append(
+        $("li.template").clone().removeClass("template").attr("data-city",name).text(name)
+    );
+}
+//load city data
+function loadCities(){
+    CITIES = STORAGE.data;
+    for(let city of CITIES){
+        addCityToListGroup(city.name);
+    }
+}
 //save the city
 function saveCity() {
     CITIES.push(CURRENT_CITY);
     //update local storage
-    STORAGE.saveData(CITIES);
+    STORAGE.data = CITIES;
 }
 
 function getCurrentLocation() {
@@ -68,6 +78,16 @@ function getCurrentLocation() {
             CURRENT_CITY.latitude = position.coords.latitude;
             CURRENT_CITY.longitude = position.coords.longitude;
             loadPageData();
+        }, function(error){
+            console.log("Error", error.message);
+            //there is an error so 
+            if(CITIES.length>0){
+                //if there is cities list get the most recent one. 
+                const city = CITIES.slice(-1)[0];
+                updateCityInfo(city.name, city.country, city.latitude, city.longitude);
+                loadPageData();
+            }
+            
         })
     }
 }
@@ -115,7 +135,6 @@ function getURL(type = QUERY_WEATHER) {
     url += "?appid=" + API_SETTINGS.apiKey; // add api key to url
     url += query;   //add query
 
-    console.log(url)
     return url;
 
 }
@@ -141,8 +160,6 @@ function getQuery(isOnlyCoords = false) {
         //add this value only if we have location data
         //set temperature format
         query += "&units="+API_SETTINGS.temperatureUnit.apiQuery;
-        //set no of records for forecast data
-        // query += "&cnt="+API_SETTINGS.noOfForecast;
     }
     return query; //return empty string so that it won't break others. 
 }
@@ -286,7 +303,6 @@ function getUVclass(value) {
     const range = API_SETTINGS.uvIndex.range;
     let prop;
     for (prop in range) {
-        // console.log(prop);
         if ((prop === "extreme" && value >= range[prop].min) || between(value, range[prop].min, range[prop].max)) {
             break;
 
@@ -314,7 +330,6 @@ function renderUVIndex(info) {
     let unit = API_SETTINGS.uvIndex.unit;
     let value = info.value;
     let classname = getUVclass(value);
-    console.log(classname);
 
     //remove old classes
     $("#uv-index").removeAttr("class");
@@ -336,28 +351,23 @@ function renderUVIndex(info) {
 
 function renderForecast(response){
     const forecasts = response.list;
-    console.log(forecasts.length)
     // const TOMORROW = TODAY.clone().add(1,"day");
     let desireDate = moment().add(24,"hour").hour(11).startOf("hour");
-    console.log(desireDate.format());
+    const row = $(".forecast-container .row");
+    row.find(".col-auto:not(.template)").remove();
     for(let forecast of forecasts){
         const day = moment(forecast.dt*1000);
-        console.log(day.format())
         if(day.isSame(desireDate)){
             //if same day, render the data for display
             let container = $(".forecast-container .template").clone();
             container.removeClass('template');
-            // console.log(container)
             container.find(".forecast-date").text(day.format(DATE_FORMAT));
-            // console.log(forecast.weather)
             let url = getImageURL(forecast.weather[0].icon);
 
-            // console.log(url)
             container.find('.forecast-icon').attr({
                 src: url,
                 alt: forecast.weather[0].description
             });
-            // console.log(container)
             
             container.find(".forecast-temp").text(forecast.main.temp);
             container.find(".forecast-temp-unit").html(API_SETTINGS.temperatureUnit.htmlSymbol);
@@ -366,11 +376,13 @@ function renderForecast(response){
             container.find(".forecast-humidity-unit").text(API_SETTINGS.humidity.unit);
 
 
-            $(".forecast-container .row").append(container);
+            row.append(container);
 
             desireDate = desireDate.add(24,"hour").hour(11).startOf("hour");
         }
     }
+    //display forecast div
+    $(".forecast").show();
 
 }
 

@@ -33,12 +33,13 @@
             </form>
             <ul class="list-group city-list droppable">
                 <!-- searched cities goes here -->
-                <li class="list-group-item template">+</li> 
+                <li class="list-group-item template"><strong>Saved Cities</strong></li> 
+                <li class="list-group-item add-new">+</li>
             </ul>
         </aside>
         <main class="container">
             <div class="row ">
-                <div class="col-12" id="current-weather-container">
+                <div class="col-12 hidden" id="current-weather-container">
                     <section class="city-section">
                         <h2>
                             <span id="city" class="draggable"></span>
@@ -77,7 +78,7 @@
 
                 </div>
             </div>
-            <div class="row forecast">
+            <div class="row forecast hidden">
                 <h2>5-Day Forecast:</h2>
                 <div class="forecast-container">
                     <div class="row">
