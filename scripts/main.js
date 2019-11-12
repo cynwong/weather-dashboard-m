@@ -11,7 +11,7 @@ const QUERY_WEATHER = "weather";
 const QUERY_FORECAST = "forecast";
 const QUERY_UV_INDEX = "uv-index";
 
-const STORAGE = new StorageHandler("cities",CITIES);
+const STORAGE = new StorageHandler("cities", CITIES);
 
 $(document).ready(function () {
 
@@ -26,7 +26,7 @@ $(document).ready(function () {
             "ui-droppable-hover": "ui-state-hover"
         },
         drop: function (event, ui) {
-            if(CITIES.indexOf(CURRENT_CITY) !== -1){
+            if (CITIES.indexOf(CURRENT_CITY) !== -1) {
                 //if we have the name already then, don't add
                 return;
             }
@@ -40,17 +40,18 @@ $(document).ready(function () {
         event.preventDefault();
         disabledForm();
 
-        let selectedCity = $("#txt-city").val().trim();
-        // cityInfo = cityInfo.trim();
+        let selectedCity = $("#txt-city").val().trim().split(",")[0];
 
-        // getWeatherData(selectedCity);
+        console.log(selectedCity);
+        updateCityInfo(selectedCity);
+        loadPageData();
 
 
     })
 });
 
 //save the city
-function saveCity(){
+function saveCity() {
     CITIES.push(CURRENT_CITY);
     //update local storage
     STORAGE.saveData(CITIES);
@@ -124,13 +125,13 @@ function getURL(type = QUERY_WEATHER) {
  */
 function getQuery(isOnlyCoords = false) {
     let query;
-    if (CURRENT_CITY.latitude !== "" && CURRENT_CITY.longitude !== "") {
+    if (isValueExisted(CURRENT_CITY.latitude) && isValueExisted(CURRENT_CITY.longitude)) {
         return `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
-    } else if (!isOnlyCoords && CURRENT_CITY.name) {
+    } else if (!isOnlyCoords && isValueExisted(CURRENT_CITY.name)) {
         //if not only-coordinate-query and have city name
         //use cityname as query
-        query = "&q=" + this.name;
-        if (typeof CURRENT_CITY.country !== "undefined" && CURRENT_CITY.country.length > 0) {
+        query = "&q=" + CURRENT_CITY.name;
+        if (isValueExisted(CURRENT_CITY.country)) {
             //if there is country value
             query += ",".CURRENT_CITY.country;
         }
@@ -140,35 +141,39 @@ function getQuery(isOnlyCoords = false) {
 }
 
 function loadPageData() {
-    //get Weather data
-    $.ajax({
-        url: getURL(QUERY_WEATHER),
-        method: "GET"
-    }).done(
-        renderWeather
-    ).fail(error => {
-        displayError(error.responseJSON);
-    });
 
-    //get UV Indes data
-    $.ajax({
-        url: getURL(QUERY_UV_INDEX),
-        method: "GET"
-    }).done(
-        renderUVIndex
-    ).fail(error => {
-        displayError(error.responseJSON);
-    });
+    function getDataFromServer(type, success_callback){
+        $.ajax({
+            url:getURL(type),
+            method: "GET"
+        }).then(
+            success_callback,
+            error=>{
+                displayError(error.responseJSON);
+            }
+        )
+    }
+    //get Weather data
+    getDataFromServer(
+        QUERY_WEATHER,
+        response => {
+            //re-render the page
+            renderWeather(response);
+            //update the current city info
+            updateCityInfo(response.name, response.sys.country, response.coord.lat, response.coord.lon);
+            //get UV Index data
+            getDataFromServer(QUERY_UV_INDEX,renderUVIndex);
+        }
+    );
+    
+    
 
     //get Forecast data
-    $.ajax({
-        url: getURL(QUERY_FORECAST),
-        method: "GET"
-    }).done(response => {
-
-    }).fail(error => {
-        displayError(error.responseJSON);
-    });
+    getDataFromServer(
+        QUERY_FORECAST,
+        renderForecast
+    );
+    enabledForm();
 }
 
 function displayError(error) {
@@ -220,10 +225,22 @@ function renderWeather(info) {
 
     //now display the current weather info container.
     $("#current-weather-container").show();
-    updateCityInfo(info.name, info.sys.country, info.coord.lat, info.coord.lon);
+    
     //Note: UV index is in another API call. so it is in another function. 
 }
-
+/**
+ * check if the value is exist and not undefined or empty string
+ * @param {string|number} value 
+ */
+function isValueExisted(value) {
+    if (typeof value === "undefined") {
+        return false;
+    } else if (typeof value === "string" && value.length === 0) {
+        //empty string
+        return false;
+    }
+    return true;
+}
 /**
  * Update the current city info
  * @param {string} name 
@@ -231,11 +248,12 @@ function renderWeather(info) {
  * @param {number} lat 
  * @param {number} lon 
  */
-function updateCityInfo(name, country, lat, lon){
-    CURRENT_CITY.name = name;
-    CURRENT_CITY.country= country;
-    CURRENT_CITY.latitude = lat;
-    CURRENT_CITY.longitude = lon;
+function updateCityInfo(name, country, lat, lon) {
+
+    CURRENT_CITY.name = isValueExisted(name) ? name : "";
+    CURRENT_CITY.country = isValueExisted(country) ? country : "";
+    CURRENT_CITY.latitude = isValueExisted(lat) ? lat : "";
+    CURRENT_CITY.longitude = isValueExisted(lon) ? lon : "";
 }
 
 
@@ -281,11 +299,14 @@ function renderUVIndex(info) {
     let classname = getUVclass(value);
     console.log(classname);
 
+    //remove old classes
+    $("#uv-index").removeAttr("class");
+    //add new data and class
     $("#uv-index").text(value).addClass(classname);
 
 
 
-    if (unit) {
+    if (isValueExisted(unit)) {
         $("uv-index-unit").text(unit);
     }
 
