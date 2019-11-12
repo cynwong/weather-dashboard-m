@@ -1,4 +1,4 @@
-const TODAY = moment();
+// const TODAY = moment();
 const CITIES = [];
 const CURRENT_CITY = {
     name: "",
@@ -10,6 +10,7 @@ const CURRENT_CITY = {
 const QUERY_WEATHER = "weather";
 const QUERY_FORECAST = "forecast";
 const QUERY_UV_INDEX = "uv-index";
+const DATE_FORMAT = "D/M/YYYY";
 
 const STORAGE = new StorageHandler("cities", CITIES);
 
@@ -31,7 +32,7 @@ $(document).ready(function () {
                 return;
             }
             $(this).append(
-                $("#li-template").clone().removeAttr("id").text(CURRENT_CITY.name)
+                $("li.template").clone().removeClass("template").text(CURRENT_CITY.name)
             );
             saveCity();
         }
@@ -42,7 +43,7 @@ $(document).ready(function () {
 
         let selectedCity = $("#txt-city").val().trim().split(",")[0];
 
-        console.log(selectedCity);
+        // console.log(selectedCity);
         updateCityInfo(selectedCity);
         loadPageData();
 
@@ -124,20 +125,26 @@ function getURL(type = QUERY_WEATHER) {
  * @return {string}
  */
 function getQuery(isOnlyCoords = false) {
-    let query;
+    let query = "";
     if (isValueExisted(CURRENT_CITY.latitude) && isValueExisted(CURRENT_CITY.longitude)) {
-        return `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
+        query += `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
     } else if (!isOnlyCoords && isValueExisted(CURRENT_CITY.name)) {
         //if not only-coordinate-query and have city name
         //use cityname as query
-        query = "&q=" + CURRENT_CITY.name;
+        query += "&q=" + CURRENT_CITY.name;
         if (isValueExisted(CURRENT_CITY.country)) {
             //if there is country value
             query += ",".CURRENT_CITY.country;
         }
-        return query;
     }
-    return ""; //return empty string so that it won't break others. 
+    if(isValueExisted(query)===true){
+        //add this value only if we have location data
+        //set temperature format
+        query += "&units="+API_SETTINGS.temperatureUnit.apiQuery;
+        //set no of records for forecast data
+        // query += "&cnt="+API_SETTINGS.noOfForecast;
+    }
+    return query; //return empty string so that it won't break others. 
 }
 
 function loadPageData() {
@@ -195,8 +202,18 @@ function displayError(error) {
         $("<div>").addClass("alert").text(message)
     );
 }
-function renderWeather(info) {
+
+/**
+ * construct image url
+ * @param {string} imgName name of the image
+ * @return {string} image url
+ */
+function getImageURL(imgName){
     const weatherIcon = API_SETTINGS.weatherIcon;
+
+    return weatherIcon.url + imgName + weatherIcon.suffixNormal
+}
+function renderWeather(info) {
     const weather = info.weather[0];
     const main = info.main;
 
@@ -206,12 +223,12 @@ function renderWeather(info) {
     //update current weather info
     $("#city").text(info.name);
 
-    $("#date").text(TODAY.format("D/M/YYYY"))
+    $("#date").text(moment(info.dt*1000).format(DATE_FORMAT));
 
 
     $("#icon").attr({
         alt: weather.description,
-        src: weatherIcon.url + weather.icon + weatherIcon.suffixNormal
+        src: getImageURL(weather.icon)
     });
 
     $("#temp").text(main.temp);
@@ -317,38 +334,52 @@ function renderUVIndex(info) {
 
 }
 
+function renderForecast(response){
+    const forecasts = response.list;
+    console.log(forecasts.length)
+    // const TOMORROW = TODAY.clone().add(1,"day");
+    let desireDate = moment().add(24,"hour").hour(11).startOf("hour");
+    console.log(desireDate.format());
+    for(let forecast of forecasts){
+        const day = moment(forecast.dt*1000);
+        console.log(day.format())
+        if(day.isSame(desireDate)){
+            //if same day, render the data for display
+            let container = $(".forecast-container .template").clone();
+            container.removeClass('template');
+            // console.log(container)
+            container.find(".forecast-date").text(day.format(DATE_FORMAT));
+            // console.log(forecast.weather)
+            let url = getImageURL(forecast.weather[0].icon);
 
-// function getWeather(cityInfo) {
-//     let queryURL = SETTINGS.currentWeatherBaseURL + `appid=${SETTINGS.apiKey}` + `&q=${cityInfo}` + `&units=${SETTINGS.temperatureUnit.api}`;
-//     console.log(queryURL);
-//     $.ajax({
-//         url: queryURL,
-//         method: "GET"
-//     }).done((weatherResponse) => {
+            // console.log(url)
+            container.find('.forecast-icon').attr({
+                src: url,
+                alt: forecast.weather[0].description
+            });
+            // console.log(container)
+            
+            container.find(".forecast-temp").text(forecast.main.temp);
+            container.find(".forecast-temp-unit").html(API_SETTINGS.temperatureUnit.htmlSymbol);
 
-//         // $.ajax()
-//         renderWeather(response);
-//     }).fail(error => {
-//         console.log(error);
+            container.find(".forecast-humidity").text(forecast.main.humidity);
+            container.find(".forecast-humidity-unit").text(API_SETTINGS.humidity.unit);
 
-//         displayError(error.responseJSON);
-//     });
-//     enabledForm();
-// }
-/**
- * call when user search for a city or when the page is loaded.
- * reset the page depending on the user choice.
- */
-// function resetCity() {
 
-// }
+            $(".forecast-container .row").append(container);
+
+            desireDate = desireDate.add(24,"hour").hour(11).startOf("hour");
+        }
+    }
+
+}
 
 /*
 when user click search button
 1. disbled the form
 2. get current weather info from weather.com api
 3. if success
-    a. add cityname to city list & update localstorage.
+    a. add cityname to city list & update localstorage. => drag and drop??
     2. display current weather in current weather info
     3. get the forecast info
         1. if success, diplay the forecast for each day in forecast

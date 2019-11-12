@@ -33,12 +33,12 @@
             </form>
             <ul class="list-group city-list droppable">
                 <!-- searched cities goes here -->
-                <li id="li-template" class="list-group-item">+</li> 
+                <li class="list-group-item template">+</li> 
             </ul>
         </aside>
         <main class="container">
             <div class="row ">
-                <div class="col-12 " id="current-weather-container">
+                <div class="col-12" id="current-weather-container">
                     <section class="city-section">
                         <h2>
                             <span id="city" class="draggable"></span>
@@ -78,6 +78,33 @@
                 </div>
             </div>
             <div class="row forecast">
+                <h2>5-Day Forecast:</h2>
+                <div class="forecast-container">
+                    <div class="row">
+                        <div class="col-auto template">
+                            <section class="forecast-date-section">
+                                <p class="forecast-date"></p>
+                            </section>
+                            <section class="forecast-icon-section">
+                                <img class="forecast-icon">
+                            </section>
+                            <section class="forecast-temp-section">
+                                <p>
+                                    Temp:&nbsp;
+                                    <span class="forecast-temp"></span>
+                                    <span class="forecast-temp-unit"></span>
+                                </p>
+                            </section>
+                            <section class="forecast-humidity-section">
+                                <p>
+                                    Humidity:&nbsp;
+                                    <span class="forecast-humidity"></span>
+                                    <span class="forecast-humidity-unit"></span>
+                                </p>
+                            </section>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </main>

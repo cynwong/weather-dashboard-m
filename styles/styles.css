@@ -103,3 +103,25 @@ main .row #current-weather-info{
 .uv-extreme{
     background-color:rebeccapurple ;
 }
+
+.forecast {
+    margin-top: 75px;
+    background-color: white;
+}
+
+.forecast-container .template{
+    display:none;
+}
+
+.forecast-container .col-auto{
+    background: aqua;
+    padding-top:3px;
+    margin-left:20px;
+    margin-right: 12px;
+    margin-top:15px;
+}
+
+.forecast-container .forecast-date-section{
+    font-weight:600;
+    font-size: 1.2rem;
+}
