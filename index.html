@@ -22,95 +22,110 @@
         </h1>
 
     </header>
-    <div class="bodycontainer">
-        <aside>
-            <form class="form-inline md-form mr-auto mb-4">
-                <label for="txt-city"> Search for a City:</label>
-                <input id="txt-city" class="form-control" type="text">
-                <button id="btn-search" class="btn btn-rounded btn-sm" type="submit"><span
-                        class="fa fa-search"></span></button>
+    <div class="bodycontainer container-fluid">
+        <div class="row">
 
-            </form>
+            <aside class="col-sm-3">
+                <form >
+                    <label for="txt-city">
+                        <strong>
+                            Search for a City:
+                        </strong>
+                    </label> <br />
+                    <input id="txt-city" class="form-control" type="text">
+                    <button id="btn-search" class="btn btn-rounded btn-sm" type="submit"><span
+                            class="fa fa-search"></span></button>
 
-            <ul class="list-group city-list droppable">
-                <!-- searched cities goes here -->
-                <li class="list-group-item template "></li>
-                <li class="list-group-item add-new ui-state-default ui-state-disabled">+</li>
-            </ul>
+                </form>
 
-        </aside>
-        <main class="container">
-            <div class="row ">
-                <div class="col-12 hidden" id="current-weather-container">
-                    <section class="city-section">
-                        <h2>
-                            <span id="city" class="draggable"></span>
-                            (<span id="date"></span>)
-                            <span><img id="icon"></span>
-                        </h2>
-                    </section>
-                    <section class="temperature-section">
-                        <p>
-                            Temperature:&nbsp;
-                            <span id="temp"></span>
-                            <span id="temp-unit"></span>
-                        </p>
-                    </section>
-                    <section class="humidity-section">
-                        <p>
-                            Humidity:&nbsp;
-                            <span id="humidity"></span>
-                            <span id="humidity-unit"></span>
-                        </p>
-                    </section>
-                    <section class="wind-speed-section">
-                        <p>
-                            Wind Speed:&nbsp;
-                            <span id="wind-speed"></span>
-                            <span id="wind-speed-unit"></span>
-                        </p>
-                    </section>
-                    <section class="uv-index-section">
-                        <p>
-                            UV Index:&nbsp;
-                            <span id="uv-index"></span>
-                            <span id="uv-index-unit"></span>
-                        </p>
-                    </section>
-
+                <div class="list-group city-list droppable">
+                    <!-- searched cities goes here -->
+                    <!-- <h4 class="list-group-item add-new ui-state-default ui-state-disabled">
+                        Saved Cities
+                        <button class="btn" data-toggle="collapse" data-target=".list-container">
+                            +
+                        </button>
+                    </h4> -->
+                    <p class="list-group-item template "></p>
+                    <div class="list-container"></div>
                 </div>
-            </div>
-            <div class="row forecast hidden">
-                <h2>5-Day Forecast:</h2>
-                <div class="forecast-container">
-                    <div class="row">
-                        <div class="col-auto template">
-                            <section class="forecast-date-section">
-                                <p class="forecast-date"></p>
-                            </section>
-                            <section class="forecast-icon-section">
-                                <img class="forecast-icon">
-                            </section>
-                            <section class="forecast-temp-section">
-                                <p>
-                                    Temp:&nbsp;
-                                    <span class="forecast-temp"></span>
-                                    <span class="forecast-temp-unit"></span>
-                                </p>
-                            </section>
-                            <section class="forecast-humidity-section">
-                                <p>
-                                    Humidity:&nbsp;
-                                    <span class="forecast-humidity"></span>
-                                    <span class="forecast-humidity-unit"></span>
-                                </p>
-                            </section>
+
+            </aside>
+
+            <main class="col-sm-9">
+                <div class="row ">
+                    <div class="col-12 hidden" id="current-weather-container">
+                        <section class="city-section">
+                            <h2>
+                                <span id="city" class="draggable"></span>
+                                (<span id="date"></span>)
+                                <span><img id="icon"></span>
+                            </h2>
+                        </section>
+                        <section class="temperature-section">
+                            <p>
+                                Temperature:&nbsp;
+                                <span id="temp"></span>
+                                <span id="temp-unit"></span>
+                            </p>
+                        </section>
+                        <section class="humidity-section">
+                            <p>
+                                Humidity:&nbsp;
+                                <span id="humidity"></span>
+                                <span id="humidity-unit"></span>
+                            </p>
+                        </section>
+                        <section class="wind-speed-section">
+                            <p>
+                                Wind Speed:&nbsp;
+                                <span id="wind-speed"></span>
+                                <span id="wind-speed-unit"></span>
+                            </p>
+                        </section>
+                        <section class="uv-index-section">
+                            <p>
+                                UV Index:&nbsp;
+                                <span id="uv-index"></span>
+                                <span id="uv-index-unit"></span>
+                            </p>
+                        </section>
+
+                    </div>
+                </div>
+                <div class="row forecast hidden">
+                    <div class="col-12">
+                        <h2>5-Day Forecast:</h2>
+                        <div class="forecast-container">
+                            <div class="row">
+                                <div class="col-auto template">
+                                    <section class="forecast-date-section">
+                                        <p class="forecast-date"></p>
+                                    </section>
+                                    <section class="forecast-icon-section">
+                                        <img class="forecast-icon">
+                                    </section>
+                                    <section class="forecast-temp-section">
+                                        <p>
+                                            Temp:&nbsp;
+                                            <span class="forecast-temp"></span>
+                                            <span class="forecast-temp-unit"></span>
+                                        </p>
+                                    </section>
+                                    <section class="forecast-humidity-section">
+                                        <p>
+                                            Humidity:&nbsp;
+                                            <span class="forecast-humidity"></span>
+                                            <span class="forecast-humidity-unit"></span>
+                                        </p>
+                                    </section>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"

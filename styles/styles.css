@@ -1,3 +1,8 @@
+body{
+    background-color: #eaeaea;
+    font-size: 16px;
+}
+
 header{
     background: #333;
     color: whitesmoke;
@@ -6,23 +11,22 @@ header{
 }
 
 .bodycontainer{
-    display:flex;
-    flex-direction: row;
+    margin-top: 1.3rem;
 }
 
-aside{
-    flex-basis:30%;
-    flex-grow:0;
-    margin: 5px;
+#txt-city{
+    margin-left: 10px;
+    display:inline-block;
+    width: 70%;
 }
-form label {
-    display:block;
-}
+
 #btn-search{
+    display:inline-block;
     background: #006fff;
     font-size: 1.1rem;
     color: whitesmoke;
 }
+
 #btn-search:active{
     box-shadow:inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
 }
@@ -36,7 +40,7 @@ form label {
 
 .city-list{
     min-height:5rem;
-    background-color: lightgray;
+    margin-top:2rem;
 }
 
 .city-list .add-new{
@@ -46,14 +50,6 @@ form label {
 
 .list-group-item:not(.add-new):hover{
     cursor: pointer;
-}
-
-.city-list li:nth-child(odd){
-    background-color: darkgray;
-}
-
-.city-list li:nth-child(even){
-    background-color: lightgray;
 }
 
 .ui-droppable-active{
@@ -66,16 +62,13 @@ form label {
 }
 
 main{
-    flex-basis:70%;
-    margin-top: 1.3rem;
-    flex-grow:1;
-    background-color: #e3e3ec;
-    padding-bottom:2.5rem;
+    padding: 0.5rem;
 }
 
-main .row #current-weather-info{
+main .row #current-weather-container{
     border: 1px solid darkgray;
-    /* min-height:50vh; */
+    padding-top: 1rem;
+    padding-bottom:2.5rem;
 }
 
 .draggable:active{
@@ -84,7 +77,6 @@ main .row #current-weather-info{
     padding: 5px;
 }
 #icon{
-    /* background-color:gray; */
     border-radius:50px;
 }
 
@@ -119,18 +111,17 @@ main .row #current-weather-info{
 }
 
 .forecast {
-    margin-top: 75px;
-    background-color: white;
+    margin-top: 15px;
 }
 
-
-
 .forecast-container .col-auto{
-    background: aqua;
-    padding-top:3px;
-    margin-left:20px;
+    background: dodgerblue;
+    color: white;
+    border-radius: 5px;
+    padding-top: 3px;
+    margin-left: 20px;
     margin-right: 12px;
-    margin-top:15px;
+    margin-top: 15px;
 }
 
 .forecast-container .forecast-date-section{
