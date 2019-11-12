@@ -1,6 +1,6 @@
 // const TODAY = moment();
 let CITIES = [];
-let CURRENT_CITY = {
+const CURRENT_CITY = {
     name: "",
     country: "",
     longitude: "",
@@ -26,11 +26,7 @@ $(document).ready(function () {
 
         let selectedCity = $("#txt-city").val().trim().split(",");
 
-        CURRENT_CITY.name = selectedCity[0];
-        CURRENT_CITY.country = selectedCity[1];
-        CURRENT_CITY.longitude = "";
-        CURRENT_CITY.latitude = "";
-        // updateCityInfo(selectedCity[0],selectedCity[1]);
+        updateCityInfo(selectedCity[0],selectedCity[1],"","");
         loadPageData();
 
 
@@ -48,8 +44,8 @@ $(document).ready(function () {
             let city = findThisCity(name);
             if ($.isEmptyObject(city)) {
                 //only save if not savebefore. 
-                city={
-                    name : CURRENT_CITY.name,
+                city = {
+                    name: CURRENT_CITY.name,
                     country: CURRENT_CITY.country,
                     latitude: CURRENT_CITY.latitude,
                     longitude: CURRENT_CITY.longitude
@@ -62,9 +58,10 @@ $(document).ready(function () {
             }
         }
     });
-    $(".list-group").on("click",".list-group-item:not(.add-new)",function(){
+    $(".list-group").on("click", ".list-group-item:not(.add-new)", function () {
         const name = $(this).data("city");
-        CURRENT_CITY = findThisCity(name);
+        const city = findThisCity(name);
+        updateCityInfo(city.name, city.country, city.latitude, city.longitude)
         loadPageData();
     })
 
@@ -75,21 +72,19 @@ $(document).ready(function () {
  * @param {string} name name of the city
  * @return {object} city object of CITIES
  */
-function findThisCity(name){
-    return CITIES.find((city)=>city.name === name);
+function findThisCity(name) {
+    return CITIES.find((city) => city.name === name);
 }
 
-function addCityToListGroup(name){
+function addCityToListGroup(name) {
     $(".list-group").append(
-        $("li.template").clone().removeClass("template").attr("data-city",name).text(name)
+        $("li.template").clone().removeClass("template").attr("data-city", name).text(name)
     );
 }
 //load city data
-function loadCities(){
+function loadCities() {
     CITIES = STORAGE.data;
-
-    console.log(CITIES);
-    for(let city of CITIES){
+    for (let city of CITIES) {
         addCityToListGroup(city.name);
     }
 
@@ -103,23 +98,35 @@ function getCurrentLocation() {
             if (typeof position === "undefined") {
                 return -1;
             }
-            CURRENT_CITY.latitude = position.coords.latitude;
-            CURRENT_CITY.longitude = position.coords.longitude;
-            CURRENT_CITY.name = "";
-            CURRENT_CITY.country="";
+            updateCityInfo("","",position.coords.latitude,position.coords.longitude )
             loadPageData();
-        }, function(error){
+        }, function (error) {
+            let city;
             console.log("Error", error.message);
             //there is an error so 
-            if(CITIES.length>0){
+            if (CITIES.length > 0) {
                 //if there is cities list get the most recent one. 
-                CURRENT_CITY = CITIES.slice(-1)[0];
-                // updateCityInfo(city.name, city.country, city.latitude, city.longitude);
+                city = CITIES.slice(-1)[0];
+                updateCityInfo(city.name, city.country, city.latitude, city.longitude);
                 loadPageData();
             }
-            
+
         })
     }
+}
+
+/**
+ * update Current City data
+ * @param {string} name 
+ * @param {string} country 
+ * @param {string} latitude 
+ * @param {string} longitude 
+ */
+function updateCityInfo(name, country, latitude, longitude) {
+    CURRENT_CITY.name = name;
+    CURRENT_CITY.country = country;
+    CURRENT_CITY.latitude = latitude;
+    CURRENT_CITY.longitude = longitude;
 }
 /**
  * Disable search input box and button
@@ -181,28 +188,28 @@ function getQuery(isOnlyCoords = false) {
         query += "&q=" + CURRENT_CITY.name;
         if (isValueExisted(CURRENT_CITY.country)) {
             //if there is country value
-            query += ","+CURRENT_CITY.country;
+            query += "," + CURRENT_CITY.country;
         }
     } else if (isValueExisted(CURRENT_CITY.latitude) && isValueExisted(CURRENT_CITY.longitude)) {
         query += `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
-    } 
-    if(isValueExisted(query)===true){
+    }
+    if (isValueExisted(query) === true) {
         //add this value only if we have location data
         //set temperature format
-        query += "&units="+API_SETTINGS.temperatureUnit.apiQuery;
+        query += "&units=" + API_SETTINGS.temperatureUnit.apiQuery;
     }
     return query; //return empty string so that it won't break others. 
 }
 
 function loadPageData() {
 
-    function getDataFromServer(type, success_callback){
+    function getDataFromServer(type, success_callback) {
         $.ajax({
-            url:getURL(type),
+            url: getURL(type),
             method: "GET"
         }).then(
             success_callback,
-            error=>{
+            error => {
                 displayError(error.responseJSON);
             }
         )
@@ -220,11 +227,11 @@ function loadPageData() {
             CURRENT_CITY.longitude = response.coord.lon;
             // updateCityInfo(response.name, response.sys.country, response.coord.lat, response.coord.lon);
             //get UV Index data
-            getDataFromServer(QUERY_UV_INDEX,renderUVIndex);
+            getDataFromServer(QUERY_UV_INDEX, renderUVIndex);
         }
     );
-    
-    
+
+
 
     //get Forecast data
     getDataFromServer(
@@ -259,7 +266,7 @@ function displayError(error) {
  * @param {string} imgName name of the image
  * @return {string} image url
  */
-function getImageURL(imgName){
+function getImageURL(imgName) {
     const weatherIcon = API_SETTINGS.weatherIcon;
 
     return weatherIcon.url + imgName + weatherIcon.suffixNormal
@@ -274,7 +281,7 @@ function renderWeather(info) {
     //update current weather info
     $("#city").text(info.name);
 
-    $("#date").text(moment(info.dt*1000).format(DATE_FORMAT));
+    $("#date").text(moment(info.dt * 1000).format(DATE_FORMAT));
 
 
     $("#icon").attr({
@@ -293,7 +300,7 @@ function renderWeather(info) {
 
     //now display the current weather info container.
     $("#current-weather-container").show();
-    
+
     //Note: UV index is in another API call. so it is in another function. 
 }
 /**
@@ -368,15 +375,15 @@ function renderUVIndex(info) {
 
 }
 
-function renderForecast(response){
+function renderForecast(response) {
     const forecasts = response.list;
     // const TOMORROW = TODAY.clone().add(1,"day");
-    let desireDate = moment().add(24,"hour").hour(11).startOf("hour");
+    let desireDate = moment().add(24, "hour").hour(11).startOf("hour");
     const row = $(".forecast-container .row");
     row.find(".col-auto:not(.template)").remove();
-    for(let forecast of forecasts){
-        const day = moment(forecast.dt*1000);
-        if(day.isSame(desireDate)){
+    for (let forecast of forecasts) {
+        const day = moment(forecast.dt * 1000);
+        if (day.isSame(desireDate)) {
             //if same day, render the data for display
             let container = $(".forecast-container .template").clone();
             container.removeClass('template');
@@ -387,7 +394,7 @@ function renderForecast(response){
                 src: url,
                 alt: forecast.weather[0].description
             });
-            
+
             container.find(".forecast-temp").text(forecast.main.temp);
             container.find(".forecast-temp-unit").html(API_SETTINGS.temperatureUnit.htmlSymbol);
 
@@ -397,7 +404,7 @@ function renderForecast(response){
 
             row.append(container);
 
-            desireDate = desireDate.add(24,"hour").hour(11).startOf("hour");
+            desireDate = desireDate.add(24, "hour").hour(11).startOf("hour");
         }
     }
     //display forecast div
