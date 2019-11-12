@@ -31,17 +31,17 @@
                         class="fa fa-search"></span></button>
 
             </form>
-            <ul class="list-group">
+            <ul class="list-group city-list droppable">
                 <!-- searched cities goes here -->
-                <!-- <li class="list-group-item"></li> -->
+                <li id="li-template" class="list-group-item">+</li> 
             </ul>
         </aside>
         <main class="container">
-            <div class="row">
-                <div class="col-12" id="current-weather-container">
+            <div class="row ">
+                <div class="col-12 " id="current-weather-container">
                     <section class="city-section">
                         <h2>
-                            <span id="city"></span>
+                            <span id="city" class="draggable"></span>
                             (<span id="date"></span>)
                             <span><img id="icon"></span>
                         </h2>
@@ -85,6 +85,8 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+        integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>

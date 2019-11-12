@@ -17,6 +17,24 @@ $(document).ready(function () {
     getCurrentLocation();
 
     //--------- Add event listeners -----------
+    $(".draggable").draggable({
+        revert: true
+    });
+    $(".droppable").droppable({
+        classes: {
+            "ui-droppable-hover": "ui-state-hover"
+        },
+        drop: function (event, ui) {
+            if(CITIES.indexOf(CURRENT_CITY) !== -1){
+                //if we have the name already then, don't add
+                return;
+            }
+            $(this).append(
+                $("#li-template").clone().removeAttr("id").text(CURRENT_CITY.name)
+            );
+            CITIES.push(CURRENT_CITY)
+        }
+    });
     $("#btn-search").on("click", function (event) {
         event.preventDefault();
         disabledForm();
@@ -194,10 +212,30 @@ function renderWeather(info) {
 
     //now display the current weather info container.
     $("#current-weather-container").show();
-
+    updateCityInfo(info.name, info.sys.country, info.coord.lat, info.coord.lon);
     //Note: UV index is in another API call. so it is in another function. 
 }
 
+/**
+ * Update the current city info
+ * @param {string} name 
+ * @param {string} country 
+ * @param {number} lat 
+ * @param {number} lon 
+ */
+function updateCityInfo(name, country, lat, lon){
+    CURRENT_CITY.name = name;
+    CURRENT_CITY.country= country;
+    CURRENT_CITY.latitude = lat;
+    CURRENT_CITY.longitude = lon;
+}
+
+
+/**
+ * find the css style class name for the uv-index value. 
+ * @param {number} value UV Index value
+ * @return {string} style class name according to UV index value. 
+ */
 function getUVclass(value) {
     function between(value, min, max) {
         return value >= min && value <= max;
@@ -225,6 +263,10 @@ function getUVclass(value) {
     }
 }
 
+/**
+ * Prepare the display from the value the server return.
+ * @param {object} info reponse JSON object return from the server
+ */
 function renderUVIndex(info) {
     let unit = API_SETTINGS.uvIndex.unit;
     let value = info.value;

@@ -31,6 +31,24 @@ aside{
     border: 1px solid #0842e6;
 }
 
+.city-list{
+    min-height:5rem;
+    background-color: lightgray;
+}
+
+.city-list li:nth-child(odd){
+    background-color: darkgray;
+}
+
+.city-list li:nth-child(even){
+    background-color: lightgray;
+}
+
+.ui-droppable-active{
+    border: 1px dashed black;
+    
+}
+
 #current-weather-container{
     display:none;
 }
@@ -48,6 +66,11 @@ main .row #current-weather-info{
     /* min-height:50vh; */
 }
 
+.draggable:active{
+    background-color: lightgray;
+    border: 1px solid darkgray;
+    padding: 5px;
+}
 #icon{
     /* background-color:gray; */
     border-radius:50px;
