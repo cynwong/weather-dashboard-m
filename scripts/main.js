@@ -27,22 +27,23 @@ $(document).ready(function () {
             "ui-droppable-hover": "ui-state-hover"
         },
         drop: function () {
-            if (CITIES.indexOf(CURRENT_CITY) !== -1) {
-                //if we have the name already then, don't add
-                return;
+            let city = CITIES.find(city=>city.name === CURRENT_CITY.name);
+            if ($.isEmptyObject(city)) {
+                //only save if not savebefore. 
+                addCityToListGroup(CURRENT_CITY.name);
+                saveCity();
             }
-            console.log("here")
-            addCityToListGroup(CURRENT_CITY.name);
-            saveCity();
         }
     });
+
     $("#btn-search").on("click", function (event) {
         event.preventDefault();
         disabledForm();
 
-        let selectedCity = $("#txt-city").val().trim().split(",")[0];
+        let selectedCity = $("#txt-city").val().trim().split(",");
 
-        updateCityInfo(selectedCity);
+
+        updateCityInfo(selectedCity[0],selectedCity[1]);
         loadPageData();
 
 
@@ -50,8 +51,9 @@ $(document).ready(function () {
 });
 
 function addCityToListGroup(name){
+    const index = CITIES.findIndex(city => city.name === name);
     $(".list-group").append(
-        $("li.template").clone().removeClass("template").attr("data-city",name).text(name)
+        $("li.template").clone().removeClass("template").attr("data-city",name).attr("data-index",index).text(name)
     );
 }
 //load city data
@@ -60,6 +62,7 @@ function loadCities(){
     for(let city of CITIES){
         addCityToListGroup(city.name);
     }
+
 }
 //save the city
 function saveCity() {
@@ -153,7 +156,7 @@ function getQuery(isOnlyCoords = false) {
         query += "&q=" + CURRENT_CITY.name;
         if (isValueExisted(CURRENT_CITY.country)) {
             //if there is country value
-            query += ",".CURRENT_CITY.country;
+            query += ","+CURRENT_CITY.country;
         }
     }
     if(isValueExisted(query)===true){
