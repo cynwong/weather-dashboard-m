@@ -77,8 +77,8 @@ function findThisCity(name) {
 }
 
 function addCityToListGroup(name) {
-    $(".list-group").append(
-        $("li.template").clone().removeClass("template").attr("data-city", name).text(name)
+    $(".list-container").append(
+        $(".list-group-item.template").clone().removeClass("template").attr("data-city", name).text(name)
     );
 }
 //load city data
