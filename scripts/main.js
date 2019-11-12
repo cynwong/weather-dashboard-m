@@ -1,6 +1,6 @@
 // const TODAY = moment();
 let CITIES = [];
-const CURRENT_CITY = {
+let CURRENT_CITY = {
     name: "",
     country: "",
     longitude: "",
@@ -19,6 +19,21 @@ $(document).ready(function () {
     loadCities();
     getCurrentLocation();
     //--------- Add event listeners -----------
+
+    $("#btn-search").on("click", function (event) {
+        event.preventDefault();
+        disabledForm();
+
+        let selectedCity = $("#txt-city").val().trim().split(",");
+
+        CURRENT_CITY.name = selectedCity[0];
+        CURRENT_CITY.country = selectedCity[1];
+        // updateCityInfo(selectedCity[0],selectedCity[1]);
+        loadPageData();
+
+
+    });
+
     $(".draggable").draggable({
         revert: true
     });
@@ -27,28 +42,30 @@ $(document).ready(function () {
             "ui-droppable-hover": "ui-state-hover"
         },
         drop: function () {
-            let city = CITIES.find(city=>city.name === CURRENT_CITY.name);
+            const name = CURRENT_CITY.name;
+            const city = findThisCity(name);
             if ($.isEmptyObject(city)) {
                 //only save if not savebefore. 
-                addCityToListGroup(CURRENT_CITY.name);
+                addCityToListGroup(name);
                 saveCity();
             }
         }
     });
-
-    $("#btn-search").on("click", function (event) {
-        event.preventDefault();
-        disabledForm();
-
-        let selectedCity = $("#txt-city").val().trim().split(",");
-
-
-        updateCityInfo(selectedCity[0],selectedCity[1]);
+    $(".list-group-item:not(.add-new)").on("click",function(){
+        const name = $(this).data("city");
+        CURRENT_CITY = findThisCity(name);
         loadPageData();
-
-
     })
+
 });
+/**
+ * 
+ * @param {string} name name of the city
+ * @return {object} city object of CITIES
+ */
+function findThisCity(name){
+    return CITIES.find(city=>city.name === name);
+}
 
 function addCityToListGroup(name){
     const index = CITIES.findIndex(city => city.name === name);
@@ -86,8 +103,8 @@ function getCurrentLocation() {
             //there is an error so 
             if(CITIES.length>0){
                 //if there is cities list get the most recent one. 
-                const city = CITIES.slice(-1)[0];
-                updateCityInfo(city.name, city.country, city.latitude, city.longitude);
+                CURRENT_CITY = CITIES.slice(-1)[0];
+                // updateCityInfo(city.name, city.country, city.latitude, city.longitude);
                 loadPageData();
             }
             
@@ -187,7 +204,11 @@ function loadPageData() {
             //re-render the page
             renderWeather(response);
             //update the current city info
-            updateCityInfo(response.name, response.sys.country, response.coord.lat, response.coord.lon);
+            CURRENT_CITY.name = response.name;
+            CURRENT_CITY.country = response.sys.country;
+            CURRENT_CITY.latitude = response.coord.lat;
+            CURRENT_CITY.longitude = response.coord.lon;
+            // updateCityInfo(response.name, response.sys.country, response.coord.lat, response.coord.lon);
             //get UV Index data
             getDataFromServer(QUERY_UV_INDEX,renderUVIndex);
         }
