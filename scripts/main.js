@@ -12,7 +12,7 @@ const QUERY_FORECAST = "forecast";
 const QUERY_UV_INDEX = "uv-index";
 const DATE_FORMAT = "D/M/YYYY";
 
-const STORAGE = new StorageHandler("cities", CITIES);
+const STORAGE = new StorageHandler("cities");
 
 $(document).ready(function () {
 
@@ -28,6 +28,8 @@ $(document).ready(function () {
 
         CURRENT_CITY.name = selectedCity[0];
         CURRENT_CITY.country = selectedCity[1];
+        CURRENT_CITY.longitude = "";
+        CURRENT_CITY.latitude = "";
         // updateCityInfo(selectedCity[0],selectedCity[1]);
         loadPageData();
 
@@ -43,50 +45,56 @@ $(document).ready(function () {
         },
         drop: function () {
             const name = CURRENT_CITY.name;
-            const city = findThisCity(name);
+            let city = findThisCity(name);
             if ($.isEmptyObject(city)) {
                 //only save if not savebefore. 
+                city={
+                    name : CURRENT_CITY.name,
+                    country: CURRENT_CITY.country,
+                    latitude: CURRENT_CITY.latitude,
+                    longitude: CURRENT_CITY.longitude
+                };
+                CITIES.push(city);
+                //update local storage
+                STORAGE.data = CITIES;
+                //add list item.
                 addCityToListGroup(name);
-                saveCity();
             }
         }
     });
-    $(".list-group-item:not(.add-new)").on("click",function(){
+    $(".list-group").on("click",".list-group-item:not(.add-new)",function(){
         const name = $(this).data("city");
         CURRENT_CITY = findThisCity(name);
         loadPageData();
     })
 
 });
+
 /**
  * 
  * @param {string} name name of the city
  * @return {object} city object of CITIES
  */
 function findThisCity(name){
-    return CITIES.find(city=>city.name === name);
+    return CITIES.find((city)=>city.name === name);
 }
 
 function addCityToListGroup(name){
-    const index = CITIES.findIndex(city => city.name === name);
     $(".list-group").append(
-        $("li.template").clone().removeClass("template").attr("data-city",name).attr("data-index",index).text(name)
+        $("li.template").clone().removeClass("template").attr("data-city",name).text(name)
     );
 }
 //load city data
 function loadCities(){
     CITIES = STORAGE.data;
+
+    console.log(CITIES);
     for(let city of CITIES){
         addCityToListGroup(city.name);
     }
 
 }
-//save the city
-function saveCity() {
-    CITIES.push(CURRENT_CITY);
-    //update local storage
-    STORAGE.data = CITIES;
-}
+
 
 function getCurrentLocation() {
     if ("geolocation" in navigator) {
@@ -97,6 +105,8 @@ function getCurrentLocation() {
             }
             CURRENT_CITY.latitude = position.coords.latitude;
             CURRENT_CITY.longitude = position.coords.longitude;
+            CURRENT_CITY.name = "";
+            CURRENT_CITY.country="";
             loadPageData();
         }, function(error){
             console.log("Error", error.message);
@@ -165,9 +175,7 @@ function getURL(type = QUERY_WEATHER) {
  */
 function getQuery(isOnlyCoords = false) {
     let query = "";
-    if (isValueExisted(CURRENT_CITY.latitude) && isValueExisted(CURRENT_CITY.longitude)) {
-        query += `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
-    } else if (!isOnlyCoords && isValueExisted(CURRENT_CITY.name)) {
+    if (!isOnlyCoords && isValueExisted(CURRENT_CITY.name)) {
         //if not only-coordinate-query and have city name
         //use cityname as query
         query += "&q=" + CURRENT_CITY.name;
@@ -175,7 +183,9 @@ function getQuery(isOnlyCoords = false) {
             //if there is country value
             query += ","+CURRENT_CITY.country;
         }
-    }
+    } else if (isValueExisted(CURRENT_CITY.latitude) && isValueExisted(CURRENT_CITY.longitude)) {
+        query += `&lat=${CURRENT_CITY.latitude}&lon=${CURRENT_CITY.longitude}`;
+    } 
     if(isValueExisted(query)===true){
         //add this value only if we have location data
         //set temperature format
@@ -299,21 +309,6 @@ function isValueExisted(value) {
     }
     return true;
 }
-/**
- * Update the current city info
- * @param {string} name 
- * @param {string} country 
- * @param {number} lat 
- * @param {number} lon 
- */
-function updateCityInfo(name, country, lat, lon) {
-
-    CURRENT_CITY.name = isValueExisted(name) ? name : "";
-    CURRENT_CITY.country = isValueExisted(country) ? country : "";
-    CURRENT_CITY.latitude = isValueExisted(lat) ? lat : "";
-    CURRENT_CITY.longitude = isValueExisted(lon) ? lon : "";
-}
-
 
 /**
  * find the css style class name for the uv-index value. 

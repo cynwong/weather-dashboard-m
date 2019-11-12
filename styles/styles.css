@@ -15,7 +15,9 @@ aside{
     flex-grow:0;
     margin: 5px;
 }
-
+form label {
+    display:block;
+}
 #btn-search{
     background: #006fff;
     font-size: 1.1rem;
