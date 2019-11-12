@@ -10,7 +10,7 @@ const API_SETTINGS = {
     temperatureUnit: {
             fullName: "Fahrenheit",
             htmlSymbol: "&#x2109;",
-            api: "imperial"
+            apiQuery: "imperial"
     },
     humidity:{
         unit: "%"
