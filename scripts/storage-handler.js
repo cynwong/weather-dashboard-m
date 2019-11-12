@@ -52,4 +52,13 @@ class StorageHandler {
         }
         localStorage.setItem(this.KEY, JSON.stringify(this._data));
     }
+
+    /**
+     * 
+     * @param {array} data array of object to be stored 
+     */
+    saveData(data){
+        this.data = data;
+        this.save();
+    }
 }

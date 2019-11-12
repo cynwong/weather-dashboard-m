@@ -11,6 +11,7 @@ const QUERY_WEATHER = "weather";
 const QUERY_FORECAST = "forecast";
 const QUERY_UV_INDEX = "uv-index";
 
+const STORAGE = new StorageHandler("cities",CITIES);
 
 $(document).ready(function () {
 
@@ -32,7 +33,7 @@ $(document).ready(function () {
             $(this).append(
                 $("#li-template").clone().removeAttr("id").text(CURRENT_CITY.name)
             );
-            CITIES.push(CURRENT_CITY)
+            saveCity();
         }
     });
     $("#btn-search").on("click", function (event) {
@@ -47,6 +48,13 @@ $(document).ready(function () {
 
     })
 });
+
+//save the city
+function saveCity(){
+    CITIES.push(CURRENT_CITY);
+    //update local storage
+    STORAGE.saveData(CITIES);
+}
 
 function getCurrentLocation() {
     if ("geolocation" in navigator) {
