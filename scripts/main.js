@@ -29,7 +29,7 @@ $(document).ready(function () {
         updateCityInfo(selectedCity[0],selectedCity[1],"","");
         loadPageData();
 
-
+        $("#txt-city").val("");
     });
 
     $(".draggable").draggable({
