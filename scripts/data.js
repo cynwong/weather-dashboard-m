@@ -29,7 +29,7 @@ const API_SETTINGS = {
         }
     },
     weatherIcon: {
-        url: "http://openweathermap.org/img/wn/",
+        url: "https://openweathermap.org/img/wn/",
         suffixNormal : ".png",
         suffixLarger: "@2x.png"
     }
