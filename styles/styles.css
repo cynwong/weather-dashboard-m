@@ -78,14 +78,17 @@ main .row #current-weather-info{
 
 #uv-index{
     padding: 2px 5px;
+    color:white;
 }
 
 .uv-low{
     background-color:limegreen;
+    color:black;
 }
 
 .uv-moderate{
     background-color: yellow;
+    color:black;
 }
 
 .uv-high{
@@ -94,6 +97,7 @@ main .row #current-weather-info{
 
 .uv-very-high{
     background-color: red;
+
 }
 
 .uv-extreme{
