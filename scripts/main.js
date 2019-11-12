@@ -90,7 +90,9 @@ function loadCities() {
 
 }
 
-
+/**
+ * get user's current location from geolocation
+ */
 function getCurrentLocation() {
     if ("geolocation" in navigator) {
         //goolocation is available, get the location.
@@ -201,6 +203,9 @@ function getQuery(isOnlyCoords = false) {
     return query; //return empty string so that it won't break others. 
 }
 
+/**
+ * load Data from server to the page
+ */
 function loadPageData() {
 
     function getDataFromServer(type, success_callback) {
@@ -231,8 +236,6 @@ function loadPageData() {
         }
     );
 
-
-
     //get Forecast data
     getDataFromServer(
         QUERY_FORECAST,
@@ -241,6 +244,11 @@ function loadPageData() {
     enabledForm();
 }
 
+/**
+ * render error message for display.
+ * @param {string|object} error 
+ * 
+ */
 function displayError(error) {
     let message = "";
     if (error instanceof Object) {
@@ -257,7 +265,7 @@ function displayError(error) {
     }
 
     $("main").prepend(
-        $("<div>").addClass("alert").text(message)
+        $("<div>").addClass("alert alert-danger").text(message)
     );
 }
 
@@ -375,11 +383,17 @@ function renderUVIndex(info) {
 
 }
 
+/**
+ * Render forecast data back from the server
+ * @param {object} response 
+ * 
+ */
 function renderForecast(response) {
     const forecasts = response.list;
     // const TOMORROW = TODAY.clone().add(1,"day");
     let desireDate = moment().add(24, "hour").hour(11).startOf("hour");
     const row = $(".forecast-container .row");
+    
     row.find(".col-auto:not(.template)").remove();
     for (let forecast of forecasts) {
         const day = moment(forecast.dt * 1000);
