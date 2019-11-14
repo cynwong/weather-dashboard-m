@@ -213,10 +213,10 @@ function loadPageData() {
         (response) => {
             //update weather info display
             renderWeather(response);
-    
+
             //update current city info
             updateCityInfo(response.name, response.sys.country, response.coord.lat, response.coord.lon);
-    
+
             //do the promise here.
             $.when(
                 getDataFromServer(
@@ -230,10 +230,10 @@ function loadPageData() {
             ).done((uvResponse, forecaseResponse) => {
                 renderUVIndex(uvResponse[0]);
                 renderForecast(forecaseResponse[0]);
-    
+
                 //now everything is rendered so display the results to users
                 showWeather();
-            
+
             }).fail(error => {
                 displayError(error.responseJSON);
             }).always();
@@ -243,7 +243,7 @@ function loadPageData() {
 /**
  * display Weather and Forecast sections
  */
-function showWeather(){
+function showWeather() {
     $("#current-weather-container").show();
     $(".forecast").show();
 }
@@ -251,7 +251,7 @@ function showWeather(){
 /**
  * hide Weather and Forecast sections
  */
-function hideWeather(){
+function hideWeather() {
     $("#current-weather-container").hide();
     $(".forecast").hide();
 }
