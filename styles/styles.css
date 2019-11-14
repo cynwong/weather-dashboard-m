@@ -56,6 +56,12 @@ header{
     display:none;
 }
 
+.spinner-container{
+    margin-top:45px;
+    height: 300px;
+    text-align: center;
+}
+
 main{
     padding: 0.5rem;
 }
