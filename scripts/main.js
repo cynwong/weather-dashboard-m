@@ -9,9 +9,7 @@ const CURRENT_CITY = {
 
 const GEOCODE_URL = "https://geocode.xyz/";
 
-// const QUERY_WEATHER = "weather";
-// const QUERY_FORECAST = "forecast";
-// const QUERY_UV_INDEX = "uv-index";
+let SPINNER_TIMER;
 
 const DATE_FORMAT = "D/M/YYYY";
 
@@ -21,11 +19,13 @@ $(document).ready(function () {
 
     loadCities();
     getCurrentLocation();
+    showSpinner();
     //--------- Add event listeners -----------
 
     $("#btn-search").on("click", function (event) {
         event.preventDefault();
         disabledForm();
+        hideWeather();
 
         let selectedCity = $("#txt-city").val().trim().split(",");
 
@@ -211,11 +211,13 @@ function loadPageData() {
         API_SETTINGS.baseURL + API_SETTINGS.nowWeatherLocation,
         param,
         (response) => {
+            
+            //update current city info
+            const cityname = hasValue(CURRENT_CITY.name)? CURRENT_CITY.name:response.name;
+            updateCityInfo(cityname, response.sys.country, response.coord.lat, response.coord.lon);
+            
             //update weather info display
             renderWeather(response);
-
-            //update current city info
-            updateCityInfo(response.name, response.sys.country, response.coord.lat, response.coord.lon);
 
             //do the promise here.
             $.when(
@@ -236,7 +238,7 @@ function loadPageData() {
 
             }).fail(error => {
                 displayError(error.responseJSON);
-            }).always();
+            });
         });
     enabledForm();
 }
@@ -246,6 +248,8 @@ function loadPageData() {
 function showWeather() {
     $("#current-weather-container").show();
     $(".forecast").show();
+    //hide spinner now
+    hideSpinner();
 }
 
 /**
@@ -254,7 +258,31 @@ function showWeather() {
 function hideWeather() {
     $("#current-weather-container").hide();
     $(".forecast").hide();
+    //show spinner
+    $(".spinner-container").show();
 }
+
+/**
+ * hide spinners
+ */
+function hideSpinner(){
+    clearInterval(SPINNER_TIMER);
+    $(".spinner-container").hide();
+}
+
+/**
+ * show spinners
+ */
+function showSpinner(){
+    SPINNER_TIMER = setInterval(()=>{
+        const newSpinner = $(".spinner-grow").clone();
+        $(".spinner-container").append(newSpinner);
+    },2500);
+    $(".spinner-container").show();
+
+
+}
+
 /**
  * render error message for display.
  * @param {string|object} displayMessage 
@@ -299,7 +327,7 @@ function renderWeather(info) {
     $(".alert").remove();
 
     //update current weather info
-    $("#city").text(info.name);
+    $("#city").text(CURRENT_CITY.name);
 
     $("#date").text(moment(info.dt * 1000).format(DATE_FORMAT));
 
