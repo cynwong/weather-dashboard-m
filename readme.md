@@ -4,7 +4,7 @@ This project is deployed [here](https://cynwong.github.io/Weather_Dashboard/).
 
 ## Description
 
-Weather Dashboard is a weather application where the user can search for weather by city name e.g. "Clayton", "Melbourne".
+Weather Dashboard is an one-page application where the user can search for weather by city name e.g. "Clayton", "Melbourne".
 
 Weather Dashboard display current weather information and next five days forecasts.
 
@@ -24,6 +24,10 @@ Weather Dashboard display current weather information and next five days forecas
 
 On opening weather dashboard, weather dashboard will ask permission to use geo-location service. If allowed, weather dashboard will show current location's weather. If not allowed, weather dashboard will show weather information of last searched city.
 
+### Search a city's weather
+
+To search for weather of a city, type the name of the city in the search box and click search button.
+
 ### Save a city to Favourite searches
 
 To save a city to Favourite,
@@ -39,6 +43,17 @@ To remove a city from Favourite,
 
 Favourites are stored in LocalStorage/Browser. So, the user will be able to assess it next time they open weather dashboard.
 
-### References
+## References
 
 UV Index are colour coded as per [Bureau of Meteorology](http://www.bom.gov.au/uv/about_uv_index.shtml)(BOM)'s standard.
+
+## Technologies used
+
+* HTML5
+* CSS
+* Bootstrap
+* Font-awesome
+* Vanilla JavaScript
+* jQuery including its AJAX and Promise
+* OpenWeatherMap API
+* LocalStorage
