@@ -7,8 +7,6 @@ const CURRENT_CITY = {
     latitude: "",
 };
 
-const GEOCODE_URL = "https://geocode.xyz/";
-
 let SPINNER_TIMER;
 
 const DATE_FORMAT = "D/M/YYYY";
