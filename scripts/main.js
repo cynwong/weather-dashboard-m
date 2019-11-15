@@ -1,4 +1,4 @@
-// const TODAY = moment();
+// ================ Document onload actions ======================
 let CITIES = [];
 const CURRENT_CITY = {
     name: "",
@@ -17,9 +17,11 @@ const STORAGE = new StorageHandler("cities");
 
 $(document).ready(function () {
 
+    //load data on document onload
     loadCities();
     getCurrentLocation();
     showSpinner();
+
     //--------- Add event listeners -----------
 
     $("#btn-search").on("click", function (event) {
@@ -61,7 +63,13 @@ $(document).ready(function () {
             }
         }
     });
-    $(".list-group").on("click", ".list-group-item:not(.add-new)", function () {
+    $(".list-group").on("click", ".list-group-item", function () {
+        const name = $(this).data("city");
+        const city = findThisCity(name);
+        updateCityInfo(city.name, city.country, city.latitude, city.longitude)
+        loadPageData();
+    })
+    $(".list-group").on("hover", ".list-group-item", function () {
         const name = $(this).data("city");
         const city = findThisCity(name);
         updateCityInfo(city.name, city.country, city.latitude, city.longitude)
@@ -70,69 +78,11 @@ $(document).ready(function () {
 
 });
 
-/**
- * 
- * @param {string} name name of the city
- * @return {object} city object of CITIES
- */
-function findThisCity(name) {
-    return CITIES.find((city) => city.name === name);
-}
 
-function addCityToListGroup(name) {
-    $(".list-container").append(
-        $(".list-group-item.template").clone().removeClass("template").attr("data-city", name).text(name)
-    );
-}
-//load city data
-function loadCities() {
-    CITIES = STORAGE.data;
-    for (let city of CITIES) {
-        addCityToListGroup(city.name);
-    }
 
-}
 
-/**
- * get user's current location from geolocation
- */
-function getCurrentLocation() {
-    if ("geolocation" in navigator) {
-        //goolocation is available, get the location.
-        navigator.geolocation.getCurrentPosition(function (position) {
-            if (typeof position === "undefined") {
-                return -1;
-            }
-            updateCityInfo("", "", position.coords.latitude, position.coords.longitude)
-            loadPageData();
-        }, function (error) {
-            let city;
-            displayError("", "Error", error.message);
-            //there is an error so 
-            if (CITIES.length > 0) {
-                //if there is cities list get the most recent one. 
-                city = CITIES.slice(-1)[0];
-                updateCityInfo(city.name, city.country, city.latitude, city.longitude);
-                loadPageData();
-            }
+// ================ DOM Handler Functions ======================
 
-        })
-    }
-}
-
-/**
- * update Current City data
- * @param {string} name 
- * @param {string} country 
- * @param {string} latitude 
- * @param {string} longitude 
- */
-function updateCityInfo(name, country, latitude, longitude) {
-    CURRENT_CITY.name = name;
-    CURRENT_CITY.country = country;
-    CURRENT_CITY.latitude = latitude;
-    CURRENT_CITY.longitude = longitude;
-}
 /**
  * Disable search input box and button
  */
@@ -149,98 +99,6 @@ function enabledForm() {
     $("#btn-search").removeAttr("disabled");
     $("#txt-city").removeAttr("disabled");
     $("body").css("cursor", "default");
-}
-
-/**
- * prepare query data for ajax call
- * @param {boolean} useName if true, use city name as query. Default: false. 
- * @return {object} query parameters for ajax call.
- */
-function getQuery(useName = false) {
-    let query = {};
-
-    if (useName) {
-        let city = CURRENT_CITY.name;
-        if (hasValue(CURRENT_CITY.country)) {
-            city += "," + CURRENT_CITY.country;
-        }
-        query.q = city;
-    } else {
-        query.lat = CURRENT_CITY.latitude;
-        query.lon = CURRENT_CITY.longitude;
-    }
-
-    query.appid = API_SETTINGS.apiKey;
-    query.unit = API_SETTINGS.temperatureUnit.apiQuery;
-    return query;
-
-}
-
-/**
- * load Data from server to the page
- */
-function loadPageData() {
-    let param, url;
-    const getDataFromServer = function (url, param, success_callback) {
-        return $.ajax({
-            url,
-            method: "GET",
-            data: param
-        }).then(
-            success_callback,
-            error => {
-                displayError(error.responseJSON);
-            }
-        )
-    }
-
-    if (!hasValue(CURRENT_CITY.longitude && !hasValue(CURRENT_CITY.latitude))) {
-        if (!hasValue(CURRENT_CITY.name)) {
-            //no name, no way to get geocode. so throw an error
-            displayError("ERROR in loading data: No city data available");
-            enabledForm();
-            return;
-        }
-        param = getQuery(true);
-    } else {
-        param = getQuery(false);
-    }
-
-
-    getDataFromServer(
-        API_SETTINGS.baseURL + API_SETTINGS.nowWeatherLocation,
-        param,
-        (response) => {
-            
-            //update current city info
-            const cityname = hasValue(CURRENT_CITY.name)? CURRENT_CITY.name:response.name;
-            updateCityInfo(cityname, response.sys.country, response.coord.lat, response.coord.lon);
-            
-            //update weather info display
-            renderWeather(response);
-
-            //do the promise here.
-            $.when(
-                getDataFromServer(
-                    API_SETTINGS.baseURL + API_SETTINGS.uvIndexLocation,
-                    getQuery(false)
-                ),
-                getDataFromServer(
-                    API_SETTINGS.baseURL + API_SETTINGS.forecastLocation,
-                    getQuery(false)
-                )
-            ).done((uvResponse, forecaseResponse) => {
-                renderUVIndex(uvResponse[0]);
-                renderForecast(forecaseResponse[0]);
-
-                //now everything is rendered so display the results to users
-                showWeather();
-
-            }).fail(error => {
-                displayError(error.responseJSON);
-            });
-        });
-    enabledForm();
 }
 /**
  * display Weather and Forecast sections
@@ -265,7 +123,7 @@ function hideWeather() {
 /**
  * hide spinners
  */
-function hideSpinner(){
+function hideSpinner() {
     clearInterval(SPINNER_TIMER);
     $(".spinner-container").hide();
 }
@@ -273,40 +131,133 @@ function hideSpinner(){
 /**
  * show spinners
  */
-function showSpinner(){
-    SPINNER_TIMER = setInterval(()=>{
+function showSpinner() {
+    SPINNER_TIMER = setInterval(() => {
         const newSpinner = $(".spinner-grow").clone();
         $(".spinner-container").append(newSpinner);
-    },2500);
+    }, 2500);
     $(".spinner-container").show();
 
 
 }
 
+
+/**
+ * Append a city to city list
+ * @param {string} name 
+ */
+function addCityToListGroup(name) {
+    $(".list-container").append(
+        $(".list-group-item.template").clone().removeClass("template").attr("data-city", name).text(name)
+    );
+}
+/**
+ * load city data
+ */
+function loadCities() {
+    CITIES = STORAGE.data;
+    for (let city of CITIES) {
+        addCityToListGroup(city.name);
+    }
+}
+
+/**
+ * load Data from server to the page
+ */
+function loadPageData() {
+    let param, url;
+    /**
+     * 
+     * @param {string} url 
+     * @param {object} param 
+     * @param {function} success_callback function for ajax resolve
+     */
+    const getDataFromServer = function (url, param, resolveHandler) {
+        return $.ajax({
+            url,
+            method: "GET",
+            data: param
+        }).then(resolveHandler, rejectHandler);
+    };
+    const rejectHandler = function (error) {
+        displayError(error.responseJSON);
+    };
+
+    if (!hasValue(CURRENT_CITY.longitude && !hasValue(CURRENT_CITY.latitude))) {
+        if (!hasValue(CURRENT_CITY.name)) {
+            //no name, no way to get geocode. so throw an error
+            displayError("ERROR in loading data: No city data available");
+            enabledForm();
+            return;
+        }
+        param = getQuery(true);
+    } else {
+        param = getQuery(false);
+    }
+
+
+    getDataFromServer(
+        API_SETTINGS.baseURL + API_SETTINGS.nowWeatherLocation,
+        param,
+        (response) => {
+
+            //update current city info
+            const cityname = hasValue(CURRENT_CITY.name) ? CURRENT_CITY.name : response.name;
+            updateCityInfo(cityname, response.sys.country, response.coord.lat, response.coord.lon);
+
+            //update weather info display
+            renderWeather(response);
+
+            //do the promise here.
+            $.when(
+                getDataFromServer(
+                    API_SETTINGS.baseURL + API_SETTINGS.uvIndexLocation,
+                    getQuery(false)
+                ),
+                getDataFromServer(
+                    API_SETTINGS.baseURL + API_SETTINGS.forecastLocation,
+                    getQuery(false)
+                )
+            ).done((uvResponse, forecaseResponse) => {
+                renderUVIndex(uvResponse[0]);
+                renderForecast(forecaseResponse[0]);
+
+                //now everything is rendered so display the results to users
+                showWeather();
+
+            }).fail(rejectHandler);
+        });
+    enabledForm();
+}
+
+
 /**
  * render error message for display.
- * @param {string|object} displayMessage 
+ * @param {string|object} displayMessage error message for user display.
+ * @param {string} consoleMessage error message to be written out to console
  * 
  */
 function displayError(displayMessage, consoleMessage = "") {
-    let message = "";
-    if (displayMessage instanceof Object) {
-        //if error is object, then get message from the object
-        if (Object.keys(displayMessage).indexOf("cod") !== -1) {
-            message += `Error ${displayMessage.cod}: `;
+    if(hasValue(displayMessage)){
+        let message = "";
+        if (displayMessage instanceof Object) {
+            //if error is object, then get message from the object
+            if (Object.keys(displayMessage).indexOf("cod") !== -1) {
+                message += `Error ${displayMessage.cod}: `;
+            }
+            if (Object.keys(displayMessage).indexOf("message") !== -1) {
+                message += displayMessage.message;
+            }
         }
-        if (Object.keys(displayMessage).indexOf("message") !== -1) {
-            message += displayMessage.message;
+        if (typeof displayMessage === "string") {
+            message = displayMessage;
         }
+    
+        $("main").prepend(
+            $("<div>").addClass("alert alert-danger").text(message)
+        );
     }
-    if (typeof displayMessage === "string") {
-        message = displayMessage;
-    }
-
-    $("main").prepend(
-        $("<div>").addClass("alert alert-danger").text(message)
-    );
-    console.log(consoleMessage);
+    if (hasValue(consoleMessage)) { console.log(consoleMessage); }
 }
 
 /**
@@ -316,9 +267,13 @@ function displayError(displayMessage, consoleMessage = "") {
  */
 function getImageURL(imgName) {
     const weatherIcon = API_SETTINGS.weatherIcon;
-
     return weatherIcon.url + imgName + weatherIcon.suffixNormal
 }
+
+/**
+ * Render weather response object for the display. 
+ * @param {object} info 
+ */
 function renderWeather(info) {
     const weather = info.weather[0];
     const main = info.main;
@@ -345,24 +300,6 @@ function renderWeather(info) {
 
     $("#wind-speed").text(info.wind.speed);
     $("#wind-speed-unit").text(API_SETTINGS.windSpeed.unit);
-
-    //now display the current weather info container.
-    // $("#current-weather-container").show();
-
-    //Note: UV index is in another API call. so it is in another function. 
-}
-/**
- * check if the value is exist and not undefined or empty string
- * @param {string|number} value 
- */
-function hasValue(value) {
-    if (typeof value === "undefined") {
-        return false;
-    } else if (typeof value === "string" && value.length === 0) {
-        //empty string
-        return false;
-    }
-    return true;
 }
 
 /**
@@ -410,17 +347,9 @@ function renderUVIndex(info) {
     //add new data and class
     $("#uv-index").text(value).addClass(classname);
 
-
-
     if (hasValue(unit)) {
         $("uv-index-unit").text(unit);
     }
-
-    // if ($("#current-weather-container").is(":hidden")) {
-    //     //if current weather container is not shown. 
-    //     $("#current-weather-container").show();
-    // }
-
 }
 
 /**
@@ -461,9 +390,95 @@ function renderForecast(response) {
             desireDate = desireDate.add(24, "hour").hour(11).startOf("hour");
         }
     }
-    //display forecast div
-    // $(".forecast").show();
+}
 
+// ================ Other Functions ======================
+
+/**
+ * 
+ * @param {string} name name of the city
+ * @return {object} city object of CITIES
+ */
+function findThisCity(name) {
+    return CITIES.find((city) => city.name === name);
+}
+
+
+
+/**
+ * get user's current location from geolocation
+ */
+function getCurrentLocation() {
+    if ("geolocation" in navigator) {
+        //goolocation is available, get the location.
+        navigator.geolocation.getCurrentPosition(function (position) {
+            if (typeof position === "undefined") {
+                return -1;
+            }
+            updateCityInfo("", "", position.coords.latitude, position.coords.longitude)
+            loadPageData();
+        }, function (error) {
+            let city;
+            displayError("", "Error", error.message);
+            //there is an error so 
+            if (CITIES.length > 0) {
+                //if there is cities list get the most recent one. 
+                city = CITIES.slice(-1)[0];
+                updateCityInfo(city.name, city.country, city.latitude, city.longitude);
+                loadPageData();
+            }
+        })
+    }
+}
+/**
+ * check if the value is exist and not undefined or empty string
+ * @param {string|number} value 
+ */
+function hasValue(value) {
+    if (typeof value === "undefined") {
+        return false;
+    } else if (typeof value === "string" && value.length === 0) {
+        //empty string
+        return false;
+    }
+    return true;
+}
+/**
+ * update Current City data
+ * @param {string} name 
+ * @param {string} country 
+ * @param {string} latitude 
+ * @param {string} longitude 
+ */
+function updateCityInfo(name, country, latitude, longitude) {
+    CURRENT_CITY.name = name;
+    CURRENT_CITY.country = country;
+    CURRENT_CITY.latitude = latitude;
+    CURRENT_CITY.longitude = longitude;
+}
+
+/**
+ * prepare query data for ajax call
+ * @param {boolean} useName if true, use city name as query. Default: false. 
+ * @return {object} query parameters for ajax call.
+ */
+function getQuery(useName = false) {
+    let query = {};
+
+    if (useName) {
+        let city = CURRENT_CITY.name;
+        if (hasValue(CURRENT_CITY.country)) {
+            city += "," + CURRENT_CITY.country;
+        }
+        query.q = city;
+    } else {
+        query.lat = CURRENT_CITY.latitude;
+        query.lon = CURRENT_CITY.longitude;
+    }
+
+    query.appid = API_SETTINGS.apiKey;
+    query.unit = API_SETTINGS.temperatureUnit.apiQuery;
+    return query;
 }
 
 /*
