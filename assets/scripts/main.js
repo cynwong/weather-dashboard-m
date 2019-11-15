@@ -82,7 +82,7 @@ $(document).ready(function () {
         }
     });
     $(".list-container").on("click", ".list-group-item",function(event){
-            event.preventDefault();ß
+            event.preventDefault();
             const target = $(event.target);
 
             if(target.hasClass("list-group-item")){
