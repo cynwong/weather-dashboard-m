@@ -18,24 +18,24 @@ Weather Dashboard display current weather information and next five days forecas
 
 ## Screen Shots
 
-![Page Screenshot](./assets/images/weather_dashboard.png)
+![Page Screenshot](./assets/images/weather_dashboard.png "Application Screenshot")
 
 ## Instructions
 
-On opening weather dashboard, weather dashboard will ask permission to use geo-location service. If allowed, weather dashboard will show current location's weather. If not allowed, weather dashboard will show weather information of last searched city.
+Upon opening weather dashboard, weather dashboard will ask permission to use geo-location service. If allowed, weather dashboard will show current location's weather. If not allowed, weather dashboard will show weather information of last searched city.
 
-### Search a city's weather
+### 1. Search a city's weather
 
 To search for weather of a city, type the name of the city in the search box and click search button.
 
-### Save a city to Favourite searches
+### 2. Save a city to Favourite searches
 
 To save a city to Favourite,
     1. Click and drag the city name in weather information.
     2. Drag the name to left panel under search box.
     3. Drop the name onto the Favourite list.
 
-### Remove a city from Favourite
+### 3. Remove a city from Favourite
 
 To remove a city from Favourite,
     1. When you move your cursor onto the city name, minus button "-" will show on the right of the city name.
