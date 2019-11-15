@@ -19,9 +19,13 @@ $(document).ready(function () {
     loadCities();
     getCurrentLocation();
     showSpinner();
+    toggleListGroupByScreenSize();
 
     //--------- Add event listeners -----------
 
+    $(window).resize(()=>{
+        toggleListGroupByScreenSize();
+    })
     $("#btn-search").on("click", function (event) {
         event.preventDefault();
         disabledForm();
@@ -33,6 +37,11 @@ $(document).ready(function () {
         loadPageData();
 
         $("#txt-city").val("");
+    });
+
+    $(".btn-collapse").on("click", function(event){
+        event.preventDefault();
+        $(".list-group").toggle();
     });
 
     $(".draggable").draggable({
@@ -72,7 +81,8 @@ $(document).ready(function () {
             $(this).find("button.close").hide();
         }
     });
-    $(".list-container").on("click", ".list-group-item",function(){
+    $(".list-container").on("click", ".list-group-item",function(event){
+            event.preventDefault();ß
             const target = $(event.target);
 
             if(target.hasClass("list-group-item")){
@@ -102,6 +112,18 @@ $(document).ready(function () {
 
 
 // ================ DOM Handler Functions ======================
+/**
+ * show and hide .list-group by the screensize
+ */
+function toggleListGroupByScreenSize(){
+    if($(window).width() >=575){
+        //if small and larger screen size(Bootstrap)
+        //display saved city list
+        $(".list-group").show();
+    }else{
+        $(".list-group").hide();
+    }
+}
 
 /**
  * Disable search input box and button
@@ -440,7 +462,7 @@ function getCurrentLocation() {
             loadPageData();
         }, function (error) {
             let city;
-            displayError("", "Error", error.message);
+            displayError("", "Warning: "+ error.message);
             //there is an error so 
             if (CITIES.length > 0) {
                 //if there is cities list get the most recent one. 

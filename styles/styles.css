@@ -55,6 +55,12 @@ header{
 .list-group-item {
     text-transform: capitalize;
 }
+
+.list-group-item a{
+    text-decoration: none;
+    color: black;
+}
+
 .list-group-item:hover{
     cursor: pointer;
 }
