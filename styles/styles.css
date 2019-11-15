@@ -15,6 +15,7 @@ header{
 }
 
 #txt-city{
+    margin:0;
     margin-left: 10px;
     display:inline-block;
     width: 70%;
@@ -25,6 +26,7 @@ header{
     background: #006fff;
     font-size: 1.1rem;
     color: whitesmoke;
+    margin:0;
 }
 
 #btn-search:active{
@@ -43,14 +45,27 @@ header{
     margin-top:2rem;
 }
 
+.ui-droppable-active{
+    border: 1px dashed black;
+    transform: scaleY(1.2);
+    font-weight:400;
+    
+}
+
+.list-group-item {
+    text-transform: capitalize;
+}
 .list-group-item:hover{
     cursor: pointer;
 }
 
-.ui-droppable-active{
-    border: 1px dashed black;
-    
+.list-group-item button.close{
+    padding-left: 3px;
+    padding-right:3px;
+    cursor: pointer;
 }
+
+
 
 .hidden, .template{
     display:none;
@@ -76,6 +91,10 @@ main .row #current-weather-container{
     background-color: lightgray;
     border: 1px solid darkgray;
     padding: 5px;
+}
+
+#city{
+    text-transform: capitalize;
 }
 #icon{
     border-radius:50px;

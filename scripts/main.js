@@ -61,19 +61,41 @@ $(document).ready(function () {
             }
         }
     });
-    $(".list-group").on("click", ".list-group-item", function () {
-        const name = $(this).data("city");
-        const city = findThisCity(name);
-        updateCityInfo(city.name, city.country, city.latitude, city.longitude)
-        loadPageData();
-    })
-    $(".list-group").on("hover", ".list-group-item", function () {
-        const name = $(this).data("city");
-        const city = findThisCity(name);
-        updateCityInfo(city.name, city.country, city.latitude, city.longitude)
-        loadPageData();
-    })
+    
+    $(".list-container").on("mouseover", ".list-group-item", function () {
+        if ($(this).find("button.close").is(":hidden")) {
+            $(this).find("button.close").show();
+        }
+    });
+    $(".list-container").on("mouseout", ".list-group-item", function () {
+        if ($(this).find("button.close").is(":visible")) {
+            $(this).find("button.close").hide();
+        }
+    });
+    $(".list-container").on("click", ".list-group-item",function(){
+            const target = $(event.target);
 
+            if(target.hasClass("list-group-item")){
+                //if target is a list item
+                const name = target.data("city");
+                const city = findThisCity(name);
+                updateCityInfo(city.name, city.country, city.latitude, city.longitude);
+                loadPageData();
+                return;
+            }
+
+            if(target.parent().hasClass("close")){
+                //if target is close button
+                const item = $(this);
+                const cityIndex = CITIES.findIndex(city => city.name === item.data("city"));
+                //delete city by index
+                CITIES.splice(cityIndex, 1);
+                //update local storage
+                STORAGE.data = CITIES;
+                //update display
+                item.remove();
+            }
+    });
 });
 
 
@@ -145,9 +167,10 @@ function showSpinner() {
  * @param {string} name 
  */
 function addCityToListGroup(name) {
-    $(".list-container").append(
-        $(".list-group-item.template").clone().removeClass("template").attr("data-city", name).text(name)
-    );
+    const item = $(".list-group-item.template").clone().removeClass("template");
+    item.attr("data-city", name);
+    item.find(".list-group-item-content").text(name);
+    $(".list-container").append(item);
 }
 /**
  * load city data
@@ -236,7 +259,7 @@ function loadPageData() {
  * 
  */
 function displayError(displayMessage, consoleMessage = "") {
-    if(hasValue(displayMessage)){
+    if (hasValue(displayMessage)) {
         let message = "";
         if (displayMessage instanceof Object) {
             //if error is object, then get message from the object
@@ -250,7 +273,7 @@ function displayError(displayMessage, consoleMessage = "") {
         if (typeof displayMessage === "string") {
             message = displayMessage;
         }
-    
+
         $("main").prepend(
             $("<div>").addClass("alert alert-danger").text(message)
         );
