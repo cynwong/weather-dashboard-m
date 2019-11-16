@@ -54,6 +54,7 @@ UV Index are colour coded as per [Bureau of Meteorology](http://www.bom.gov.au/u
 * Bootstrap
 * Font-awesome
 * Vanilla JavaScript
-* jQuery including its AJAX and Promise
+* jQuery including its AJAX and Promise (when())
 * OpenWeatherMap API
 * LocalStorage
+* moment.js
