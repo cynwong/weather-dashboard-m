@@ -4,35 +4,35 @@ This project is deployed [here](https://cynwong.github.io/Weather_Dashboard/).
 
 ## Description
 
-Weather Dashboard is an one-page application where the user can search for weather by city name e.g. "Clayton", "Melbourne".
+Weather Dashboard is a one-page application where the user can search for weather by city name e.g. "Clayton", "Melbourne".
 
-Weather Dashboard display current weather information and next five days forecasts.
+Weather Dashboard display current weather information and the next five days forecasts.
 
 ## User Story
 
 ```
-    As a traveler
+    As a traveller
     I want to see the weather outlook for multiple cities
     so that I can plan a trip accordingly
 ```
 
-## Screen Shots
+## ScreenShots
 
 ![Page Screenshot](./assets/images/weather_dashboard.png "Application Screenshot")
 
 ## Instructions
 
-Upon opening weather dashboard, weather dashboard will ask permission to use geo-location service. If allowed, weather dashboard will show current location's weather. If not allowed, weather dashboard will show weather information of last searched city.
+Upon opening weather dashboard, weather dashboard will ask permission to use geo-location service. If allowed, weather dashboard will show the current location's weather. If not allowed, weather dashboard will show weather information of the last searched city.
 
 ### 1. Search a city's weather
 
-To search for weather of a city, type the name of the city in the search box and click search button.
+To search for weather of a city, type the name of the city in the search box and click the search button.
 
 ### 2. Save a city to Favourite searches
 
 To save a city to Favourite,
     1. Click and drag the city name in weather information.
-    2. Drag the name to left panel under search box.
+    2. Drag the name to left panel under the search box.
     3. Drop the name onto the Favourite list.
 
 ### 3. Remove a city from Favourite
@@ -45,7 +45,7 @@ Favourites are stored in LocalStorage/Browser. So, the user will be able to asse
 
 ## References
 
-UV Index are colour coded as per [Bureau of Meteorology](http://www.bom.gov.au/uv/about_uv_index.shtml)(BOM)'s standard.
+UV Index are colour coded as per the [Bureau of Meteorology](http://www.bom.gov.au/uv/about_uv_index.shtml)(BOM)'s standard.
 
 ## Technologies used
 
